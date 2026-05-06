@@ -268,8 +268,8 @@ function App() {
                     onClick={() => handleNavClick(link.view, link.id)}
                     className={`transition-all duration-200 ${
                       isActive
-                        ? 'text-lg font-bold text-katta-500 hover:text-katta-600'
-                        : 'text-sm font-medium text-slate-600 hover:text-katta-600 hover:font-bold'
+                        ? 'text-lg font-bold text-primary-500 hover:text-primary-600'
+                        : 'text-sm font-medium text-slate-600 hover:text-primary-600 hover:font-bold'
                     }`}
                   >
                     {link.name}
@@ -278,7 +278,7 @@ function App() {
               })}
               <button 
                 onClick={() => handleNavClick('landing', 'reservation')}
-                className="bg-katta-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-katta-600 transition-all shadow-sm active:scale-95"
+                className="bg-primary-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-600 transition-all shadow-sm active:scale-95"
               >
                 Snakk med oss
               </button>
@@ -286,7 +286,7 @@ function App() {
 
             {/* Knapp for mobilmeny */}
             <button 
-              className="md:hidden p-2 text-slate-600 hover:text-katta-500 transition-colors"
+              className="md:hidden p-2 text-slate-600 hover:text-primary-500 transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -311,8 +311,8 @@ function App() {
                       key={link.id}
                       className={`block w-full text-left transition-all py-2 ${
                         isActive 
-                          ? 'text-katta-500 font-bold text-xl'
-                          : 'text-slate-900 text-lg font-medium hover:text-katta-600 hover:font-bold'
+                          ? 'text-primary-500 font-bold text-xl'
+                          : 'text-slate-900 text-lg font-medium hover:text-primary-600 hover:font-bold'
                       }`}
                       onClick={() => handleNavClick(link.view, link.id)}
                     >
@@ -321,7 +321,7 @@ function App() {
                   );
                 })}
                 <button 
-                  className="block w-full text-center bg-katta-500 text-white py-3 rounded-3xl font-bold"
+                  className="block w-full text-center bg-primary-500 text-white py-3 rounded-3xl font-bold"
                   onClick={() => handleNavClick('landing', 'reservation')}
                 >
                   Snakk med oss
@@ -340,7 +340,7 @@ function App() {
               <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <motion.div {...fadeIn}>
                   <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
-                    Skolehelse<span className="text-katta-500">tjenesten</span>
+                    Skolehelse<span className="text-primary-500">tjenesten</span>
                     <span className="block text-2xl sm:text-3xl text-slate-400 mt-2">Hamar katedralskole</span>
                   </h1>
                   <p className="max-w-2xl mx-auto text-xl text-slate-600 mb-10 leading-relaxed">
@@ -349,7 +349,7 @@ function App() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
                       onClick={handleSnapchatCtaClick}
-                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-katta-500 text-white font-semibold text-lg hover:bg-katta-600 transition-all shadow-sm group"
+                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-primary-500 text-white font-semibold text-lg hover:bg-primary-600 transition-all shadow-sm group"
                     >
                       <Phone className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                       Kontakt via SMS
@@ -357,7 +357,7 @@ function App() {
                     <button 
                       type="button"
                       onClick={handleSnapchatCtaClick}
-                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-white text-slate-900 border-2 border-slate-200 font-semibold text-lg hover:border-katta-300 transition-all group"
+                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-white text-slate-900 border-2 border-slate-200 font-semibold text-lg hover:border-primary-300 transition-all group"
                     >
                       <MessageCircle className="mr-2 h-5 w-5 text-yellow-500 group-hover:scale-110 transition-transform" />
                       Send oss en Snap
@@ -394,13 +394,13 @@ function App() {
             </section>
 
             {/* Reservasjonsseksjon */}
-            <section id="reservation" className="py-24 bg-katta-50">
+            <section id="reservation" className="py-24 bg-primary-50">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-katta-100"
+                  className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-primary-100"
                 >
                   <div className="text-center mb-10">
                     <h2 className="text-3xl font-bold mb-4">Reserver en samtale</h2>
@@ -413,7 +413,7 @@ function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <User className="h-4 w-4 text-katta-500" /> Fullt navn
+                          <User className="h-4 w-4 text-primary-500" /> Fullt navn
                         </label>
                         <input
                           type="text"
@@ -421,13 +421,13 @@ function App() {
                           required
                           value={reservation.name}
                           onChange={(e) => setReservation({ ...reservation, name: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-katta-500/20 focus:border-katta-500 transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                           placeholder="Ditt navn"
                         />
                       </div>
                       <div className="space-y-2">
                         <label htmlFor="email" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-katta-500" /> E-post eller mobil
+                          <Mail className="h-4 w-4 text-primary-500" /> E-post eller mobil
                         </label>
                         <input
                           type="text"
@@ -435,7 +435,7 @@ function App() {
                           required
                           value={reservation.email}
                           onChange={(e) => setReservation({ ...reservation, email: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-katta-500/20 focus:border-katta-500 transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                           placeholder="Hvordan kan vi nå deg?"
                         />
                       </div>
@@ -444,7 +444,7 @@ function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label htmlFor="date" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-katta-500" /> Ønsket dato
+                          <Calendar className="h-4 w-4 text-primary-500" /> Ønsket dato
                         </label>
                         <input
                           type="date"
@@ -455,12 +455,12 @@ function App() {
                           onChange={(e) => {
                             setReservation({ ...reservation, date: e.target.value, time: '' });
                           }}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-katta-500/20 focus:border-katta-500 transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                         />
                       </div>
                       <div className="space-y-2">
                         <label htmlFor="time" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-katta-500" /> Ønsket tidspunkt
+                          <Clock className="h-4 w-4 text-primary-500" /> Ønsket tidspunkt
                         </label>
                         <div className="flex gap-2">
                           <select
@@ -474,7 +474,7 @@ function App() {
                               const finalMinute = availableMinutes.includes(currentMinute) ? currentMinute : '00';
                               setReservation({ ...reservation, time: `${newHour}:${finalMinute}` });
                             }}
-                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-katta-500/20 focus:border-katta-500 transition-all bg-white"
+                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all bg-white"
                           >
                             <option value="" disabled>Time</option>
                             {getAvailableHours().map(h => (
@@ -494,7 +494,7 @@ function App() {
                               const currentHour = reservation.time.split(':')[0] || '09';
                               setReservation({ ...reservation, time: `${currentHour}:${newMinute}` });
                             }}
-                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-katta-500/20 focus:border-katta-500 transition-all bg-white"
+                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all bg-white"
                           >
                             <option value="" disabled>Min</option>
                             {getAvailableMinutes(reservation.time.split(':')[0]).map(m => (
@@ -503,7 +503,7 @@ function App() {
                           </select>
                         </div>
                         <p className="text-xs text-slate-500 mt-2 flex items-center gap-1.5 font-medium">
-                          <Info className="h-3.5 w-3.5 text-katta-500" />
+                          <Info className="h-3.5 w-3.5 text-primary-500" />
                           Vennligst velg et tidspunkt innenfor våre åpningstider.
                         </p>
                       </div>
@@ -518,7 +518,7 @@ function App() {
                         rows={4}
                         value={reservation.message}
                         onChange={(e) => setReservation({ ...reservation, message: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-katta-500/20 focus:border-katta-500 transition-all resize-none"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
                         placeholder="Skriv litt om hva du trenger hjelp til..."
                       />
                     </div>
@@ -537,7 +537,7 @@ function App() {
 
                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
                       <div className="flex gap-3 items-start">
-                        <ShieldCheck className="h-5 w-5 text-katta-500 shrink-0 mt-0.5" />
+                        <ShieldCheck className="h-5 w-5 text-primary-500 shrink-0 mt-0.5" />
                         <div className="text-xs text-slate-600 leading-relaxed">
                           <p className="font-semibold text-slate-700 mb-1">Personvern og sikkerhet</p>
                           Informasjonen du sender her behandles konfidensielt av skolehelsetjenesten. 
@@ -551,7 +551,7 @@ function App() {
                           required
                           checked={privacyAccepted}
                           onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                          className="w-4 h-4 rounded border-slate-300 text-katta-500 focus:ring-katta-500/20 cursor-pointer"
+                          className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500/20 cursor-pointer"
                         />
                         <span className="text-xs text-slate-600 group-hover:text-slate-900 transition-colors">
                           Jeg forstår at mine opplysninger behandles konfidensielt og slettes automatisk {import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1'} {(import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1') === '1' ? 'dag' : 'dager'} etter at timen er passert.
@@ -562,7 +562,7 @@ function App() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-katta-500 text-white py-4 rounded-xl font-bold hover:bg-katta-600 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-primary-500 text-white py-4 rounded-xl font-bold hover:bg-primary-600 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {isSubmitting ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -582,18 +582,18 @@ function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-6 rounded-3xl bg-katta-50 border border-katta-100">
-                          <h3 className="text-xl font-bold text-katta-900 mb-2">Helsesykepleier Marianne Buvik</h3>
+                        <div className="p-6 rounded-3xl bg-primary-50 border border-primary-100">
+                          <h3 className="text-xl font-bold text-primary-900 mb-2">Helsesykepleier Marianne Buvik</h3>
                           <p className="text-slate-700 mb-4">Bestill time via SMS med navn og fødselsdato.</p>
-                          <a href="tel:90269665" className="inline-flex items-center font-bold text-katta-600 hover:text-katta-700">
+                          <a href="tel:90269665" className="inline-flex items-center font-bold text-primary-600 hover:text-primary-700">
                             <Phone className="mr-2 h-4 w-4" /> 902 69 665
                           </a>
                         </div>
                         
-                        <div className="p-6 rounded-3xl bg-katta-50 border border-katta-100">
-                          <h3 className="text-xl font-bold text-katta-900 mb-2">Helsesykepleier Hanne Krøtøy</h3>
+                        <div className="p-6 rounded-3xl bg-primary-50 border border-primary-100">
+                          <h3 className="text-xl font-bold text-primary-900 mb-2">Helsesykepleier Hanne Krøtøy</h3>
                           <p className="text-slate-700 mb-4">Bestill time via SMS med navn og fødselsdato.</p>
-                          <a href="tel:91248594" className="inline-flex items-center font-bold text-katta-600 hover:text-katta-700">
+                          <a href="tel:91248594" className="inline-flex items-center font-bold text-primary-600 hover:text-primary-700">
                             <Phone className="mr-2 h-4 w-4" /> 912 48 594
                           </a>
                         </div>
@@ -601,23 +601,23 @@ function App() {
 
                       <div className="p-6 rounded-3xl bg-white border border-slate-200">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-katta-500/10 flex items-center justify-center">
-                            <Info className="h-4 w-4 text-katta-600" />
+                          <div className="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                            <Info className="h-4 w-4 text-primary-600" />
                           </div>
                           <h4 className="font-bold text-slate-900">Åpningstider</h4>
                         </div>
                         <div className="space-y-3">
                           <div className="flex justify-between items-center text-sm border-b border-slate-200 pb-2">
                             <span className="text-slate-600">Mandag, tirsdag og torsdag</span>
-                            <span className="font-bold text-katta-700">09:00 – 14:00</span>
+                            <span className="font-bold text-primary-700">09:00 – 14:00</span>
                           </div>
                           <div className="flex justify-between items-center text-sm border-b border-slate-200 pb-2">
                             <span className="text-slate-600">Onsdag</span>
-                            <span className="font-bold text-katta-700">09:00 – 13:00</span>
+                            <span className="font-bold text-primary-700">09:00 – 13:00</span>
                           </div>
                           <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-600">Fredag</span>
-                            <span className="font-bold text-katta-700">09:00 – 11:00</span>
+                            <span className="font-bold text-primary-700">09:00 – 11:00</span>
                           </div>
                         </div>
                       </div>
@@ -701,23 +701,23 @@ function App() {
             </section>
 
             {/* Sted-seksjon */}
-            <section id="hvor" className="py-24 bg-katta-900 text-white">
+            <section id="hvor" className="py-24 bg-primary-900 text-white">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                   <h2 className="text-3xl font-bold mb-4 text-white">Hvor finner du oss?</h2>
-                  <p className="text-katta-100 max-w-xl mx-auto text-lg">
+                  <p className="text-primary-100 max-w-xl mx-auto text-lg">
                     Vi holder til sentralt på skolen for at det skal være lett å stikke innom.
                   </p>
                 </div>
-                <div className="bg-katta-800/50 rounded-3xl p-8 md:p-12 border border-katta-700/50 flex flex-col md:flex-row gap-12 items-center">
+                <div className="bg-primary-800/50 rounded-3xl p-8 md:p-12 border border-primary-700/50 flex flex-col md:flex-row gap-12 items-center">
                   <div className="flex-1 space-y-10">
                     <div className="flex gap-6">
-                      <div className="w-12 h-12 rounded-2xl bg-katta-500 flex items-center justify-center shrink-0 shadow-sm">
+                      <div className="w-12 h-12 rounded-2xl bg-primary-500 flex items-center justify-center shrink-0 shadow-sm">
                         <MapPin className="h-6 w-6" />
                       </div>
                       <div>
                         <h3 className="text-xl font-bold mb-2 text-white">Besøksadresse</h3>
-                        <div className="text-katta-100 leading-relaxed">
+                        <div className="text-primary-100 leading-relaxed">
                           <p className="text-white">Hamar Katedralskole</p>
                           <p>Ringgata 235, 2315 Hamar</p>
                           <p>Fløy 1, 3. etasje (ved Elevtjenesten)</p>
@@ -726,12 +726,12 @@ function App() {
                     </div>
 
                     <div className="flex gap-6">
-                      <div className="w-12 h-12 rounded-2xl bg-katta-500 flex items-center justify-center shrink-0 shadow-sm">
+                      <div className="w-12 h-12 rounded-2xl bg-primary-500 flex items-center justify-center shrink-0 shadow-sm">
                         <Heart className="h-6 w-6" />
                       </div>
                       <div>
                         <h3 className="text-xl font-bold mb-1 text-white">Drop-in</h3>
-                        <p className="text-katta-100 leading-relaxed">
+                        <p className="text-primary-100 leading-relaxed">
                           Kom innom hvis døra er åpen. Ingen sak er for liten.
                         </p>
                       </div>
@@ -742,13 +742,13 @@ function App() {
                         href="https://www.google.com/maps/search/?api=1&query=60.80578546070512,11.054866109563148" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-katta-100 font-bold hover:text-white transition-all border-b-2 border-katta-500 hover:border-white pb-1"
+                        className="inline-flex items-center gap-2 text-primary-100 font-bold hover:text-white transition-all border-b-2 border-primary-500 hover:border-white pb-1"
                       >
                         Se skolen i kart <ArrowRight className="h-5 w-5" />
                       </a>
                     </div>
                   </div>
-                  <div className="flex-1 w-full aspect-video bg-katta-950/50 rounded-3xl border border-katta-700/50 overflow-hidden">
+                  <div className="flex-1 w-full aspect-video bg-primary-950/50 rounded-3xl border border-primary-700/50 overflow-hidden">
                     <iframe 
                       src="https://maps.google.com/maps?q=60.80578546070512,11.054866109563148&z=17&output=embed" 
                       width="100%" 
@@ -782,18 +782,18 @@ function App() {
             <div>
               <h4 className="font-bold mb-3">Lenker</h4>
               <ul className="space-y-2 text-slate-600">
-                <li><a href="#" className="hover:text-katta-500 transition-colors">Utdanningstilbud</a></li>
-                <li><a href="#" className="hover:text-katta-500 transition-colors">For elever</a></li>
-                <li><a href="#" className="hover:text-katta-500 transition-colors">Om skolen</a></li>
-                <li><a href="#" className="hover:text-katta-500 transition-colors">Kontakt oss</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Utdanningstilbud</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">For elever</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Om skolen</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Kontakt oss</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-3">Ressurser</h4>
               <ul className="space-y-2 text-slate-600">
-                <li><a href="https://innlandetfylke.no/om-fylkeskommunen/personvern/" target="_blank" className="flex items-center gap-1 hover:text-katta-500">Personvern <ExternalLink className="h-3 w-3" /></a></li>
-                <li><a href="https://innlandetfylke.no/om-fylkeskommunen/informasjonskapsler/" target="_blank" className="flex items-center gap-1 hover:text-katta-500">Informasjonskapsler <ExternalLink className="h-3 w-3" /></a></li>
-                <li><a href="https://uustatus.no/nb/erklaringer/publisert/947710bb-4ba7-43d7-8638-def79b4ab3dd" target="_blank" className="flex items-center gap-1 hover:text-katta-500">Tilgjengelighetserklæring <ExternalLink className="h-3 w-3" /></a></li>
+                <li><a href="https://innlandetfylke.no/om-fylkeskommunen/personvern/" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Personvern <ExternalLink className="h-3 w-3" /></a></li>
+                <li><a href="https://innlandetfylke.no/om-fylkeskommunen/informasjonskapsler/" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Informasjonskapsler <ExternalLink className="h-3 w-3" /></a></li>
+                <li><a href="https://uustatus.no/nb/erklaringer/publisert/947710bb-4ba7-43d7-8638-def79b4ab3dd" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Tilgjengelighetserklæring <ExternalLink className="h-3 w-3" /></a></li>
               </ul>
             </div>
           </div>

@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        katta: {
+        primary: {
           50: '#F0F7F6',
           100: '#B1CCC9',
           200: '#7EAAA6',

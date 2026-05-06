@@ -53,7 +53,7 @@ function PublicCalendar() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 pb-6 pt-0">
-      <h2 className="text-3xl font-bold text-katta-500 mb-6 flex items-center gap-2">
+      <h2 className="text-3xl font-bold text-primary-500 mb-6 flex items-center gap-2">
         <Calendar className="h-8 w-8" /> Opptatte tidspunkter
       </h2>
       <p className="text-slate-600 mb-8">Her kan du se når helsesykepleier er opptatt. Du kan ikke se hvem som har avtale.</p>
@@ -64,7 +64,7 @@ function PublicCalendar() {
         ) : (
           appointments.map((app, index) => (
             <div key={index} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-center gap-6">
-              <div className="flex flex-col items-center justify-center bg-katta-500 text-white rounded-xl px-4 py-3 min-w-[80px]">
+              <div className="flex flex-col items-center justify-center bg-primary-500 text-white rounded-xl px-4 py-3 min-w-[80px]">
                 <span className="text-3xl font-black leading-none">{new Date(app.date).getDate()}</span>
                 <span className="text-xs font-bold uppercase tracking-wider">{new Date(app.date).toLocaleDateString('nb-NO', { month: 'short' }).replace('.', '')}</span>
               </div>
@@ -73,10 +73,10 @@ function PublicCalendar() {
                   {new Date(app.date).toLocaleDateString('nb-NO', { weekday: 'long' })}
                 </p>
                 <div className="flex items-center gap-2 text-slate-900">
-                  <Clock className="h-5 w-5 text-katta-500" />
+                  <Clock className="h-5 w-5 text-primary-500" />
                   <span className="text-xl font-bold">Kl. {app.time.substring(0, 5)}</span>
                 </div>
-                <p className="text-katta-500 text-sm font-semibold mt-1">Opptatt</p>
+                <p className="text-primary-500 text-sm font-semibold mt-1">Opptatt</p>
               </div>
             </div>
           ))
@@ -198,7 +198,7 @@ function DoctorCalendar() {
     return (
       <div className="max-w-md mx-auto p-12 bg-white border border-slate-200 rounded-3xl shadow-xl">
         <div className="text-center mb-8">
-          <div className="inline-flex p-4 bg-katta-50 rounded-full text-katta-500 mb-4">
+          <div className="inline-flex p-4 bg-primary-50 rounded-full text-primary-500 mb-4">
             <ShieldCheck className="h-10 w-10" />
           </div>
           <h2 className="text-2xl font-bold">Kun for ansatte</h2>
@@ -209,7 +209,7 @@ function DoctorCalendar() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Brukernavn</label>
             <input 
               type="text" 
-              className={`w-full px-4 py-3 rounded-xl border ${loginError ? 'border-red-500 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-katta-500 focus:border-transparent outline-none transition-all`}
+              className={`w-full px-4 py-3 rounded-xl border ${loginError ? 'border-red-500 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all`}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Skriv inn brukernavn..."
@@ -220,7 +220,7 @@ function DoctorCalendar() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Passord</label>
             <input 
               type="password" 
-              className={`w-full px-4 py-3 rounded-xl border ${loginError ? 'border-red-500 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-katta-500 focus:border-transparent outline-none transition-all`}
+              className={`w-full px-4 py-3 rounded-xl border ${loginError ? 'border-red-500 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Skriv inn passord..."
@@ -228,7 +228,7 @@ function DoctorCalendar() {
             />
             {loginError && <p className="text-red-500 text-xs mt-1 font-medium">{loginError}</p>}
           </div>
-          <button type="submit" className="w-full bg-katta-500 text-white py-3 rounded-xl font-bold hover:bg-katta-600 transition-all shadow-md">
+          <button type="submit" className="w-full bg-primary-500 text-white py-3 rounded-xl font-bold hover:bg-primary-600 transition-all shadow-md">
             Logg inn
           </button>
         </form>
@@ -241,7 +241,7 @@ function DoctorCalendar() {
   return (
     <div className="max-w-6xl mx-auto px-6 pb-6 pt-0">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-katta-500 flex items-center gap-2">
+        <h2 className="text-3xl font-bold text-primary-500 flex items-center gap-2">
           <User className="h-8 w-8" /> Pasientoversikt
         </h2>
         <button 
@@ -286,7 +286,7 @@ function DoctorCalendar() {
                         </div>
                         <div className="flex flex-col">
                           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{new Date(app.date).toLocaleDateString('nb-NO', { weekday: 'short' })}</span>
-                          <span className="text-sm font-bold text-katta-500">Kl. {app.time.substring(0, 5)}</span>
+                          <span className="text-sm font-bold text-primary-500">Kl. {app.time.substring(0, 5)}</span>
                         </div>
                       </div>
                     </td>
@@ -345,7 +345,7 @@ export function CalendarView() {
             onClick={() => handleSubViewChange('public')}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
               subView === 'public' 
-                ? 'bg-white text-katta-500 shadow-sm' 
+                ? 'bg-white text-primary-500 shadow-sm' 
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
@@ -355,7 +355,7 @@ export function CalendarView() {
             onClick={() => handleSubViewChange('doctor')}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
               subView === 'doctor' 
-                ? 'bg-white text-katta-500 shadow-sm' 
+                ? 'bg-white text-primary-500 shadow-sm' 
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >

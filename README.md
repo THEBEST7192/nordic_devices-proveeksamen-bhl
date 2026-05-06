@@ -1,15 +1,15 @@
-# Katta Skolehelsetjeneste
+# Nettside-Mal
 
-En modernisert versjon av skolehelsetjenestens nettside for Hamar katedralskole. Bygget med React, TypeScript og Tailwind CSS v4, med en Node.js-backend og PostgreSQL-integrasjon.
+En mal/template for å bygge moderne nettsider med React, TypeScript og Tailwind CSS v4. Dette er en generell mal basert på [Katta-Helse](https://github.com/THEBEST7192/Katta-Helse) - som ble opprinnelig utviklet for en halvårs vurderingsoppgave.
 
 ## Funksjoner
 
-- **Moderne brukergrensesnitt**: Rent og responsivt design med skolens fargeprofil (#005850).
-- **Timebestilling**: Et fullstack-system for reservasjon av samtaler.
-- **Kalender-visninger**: Offentlig oversikt over opptatte tider, samt en passordbeskyttet lege-oversikt med pasientdetaljer.
-- **Åpningstider**: Oversiktlig visning av når helsetjenesten er tilgjengelig.
-- **Snapchat-integrasjon**: Enkel tilgang via Snapchat QR-kode.
-- **Interaktivt kart**: Informasjon om hvor du finner kontoret på skolen.
+- **Moderne brukergrensesnitt**: Rent og responsivt design med tilpassbar fargeprofil.
+- **Timebestilling**: Fullstack-system for reservasjon av avtaler/bookinger.
+- **Kalender-visninger**: Offentlig oversikt og passordbeskyttet admin-oversikt.
+- **Åpningstider**: Oversiktlig visning av tilgjengelighet.
+- **Sosial medier-integrasjon**: Enkel tilgang via QR-koder.
+- **Interaktivt kart**: Informasjon om lokasjon og kontaktinformasjon.
 
 ## Teknologier
 
