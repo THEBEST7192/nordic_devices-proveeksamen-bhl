@@ -11,8 +11,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Last env fra server katalog først (for lokal utvikling)
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config({ path: path.resolve(__dirname, '.env.local'), override: true });
+
+// Last deretter fra prosjektrot (for Docker)
+dotenv.config({ path: path.resolve(__dirname, '..', '.env'), override: true });
+dotenv.config({ path: path.resolve(__dirname, '..', '.env.local'), override: true });
 
 const app = express();
 const port = process.env.PORT || 6767;
@@ -62,11 +67,8 @@ const decryptMessage = (value) => {
 app.set('trust proxy', 1);
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS
-      .split(',')
-      .map(origin => origin.replace(/[\s`"']/g, '').replace(/\/$/, ''))
-      .filter(Boolean)
-  : ['http://localhost:8081', 'https://helse.the-diddy.party'];
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:8001', 'http://127.0.0.1:8001', 'https://helse.the-diddy.party'];
 
 console.log('Serveren starter med tillatte origins:', allowedOrigins);
 
@@ -112,6 +114,9 @@ app.get('/api/health', globalLimiter, (req, res) => {
 
 app.use(globalLimiter);
 app.use(express.json());
+
+// Server statiske frontend filer
+app.use(express.static(path.join(__dirname, '..', 'dist')));
 
 const initDb = async () => {
   try {
@@ -234,12 +239,17 @@ const initDb = async () => {
     }
     
     console.log('Database initialisert med normalisert skjema');
+    
+    // Kjør initiell opprydding etter at tabeller er opprettet
+    setTimeout(() => {
+      cleanupOldReservations().catch(err => {
+        console.error('Feil ved kjøring av første opprydding av reservasjoner:', err);
+      });
+    }, 3000); // Vent 3 sekunder for å sikre at tabeller er klare
   } catch (err) {
     console.error('Feil ved initialisering av database:', err);
   }
 };
-
-initDb();
 
 const reservationRetentionDaysEnv = parseInt(process.env.RESERVATION_RETENTION_DAYS || '1', 10); // 1 day, base 10
 const reservationRetentionDays = Number.isNaN(reservationRetentionDaysEnv) ? 1 : reservationRetentionDaysEnv;
@@ -283,10 +293,6 @@ setInterval(() => {
     console.error('Feil i planlagt opprydding av reservasjoner:', err);
   });
 }, cleanupIntervalMs);
-
-cleanupOldReservations().catch(err => {
-  console.error('Feil ved kjøring av første opprydding av reservasjoner:', err);
-});
 
 app.get('/api/doctors/check', async (req, res) => {
   try {
@@ -443,6 +449,11 @@ app.get('/api/reservations/public', async (req, res) => {
   }
 });
 
+// Server React app for client-side routing (catch-all)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+});
+
 // Global feilhåndtering
 app.use((err, req, res, next) => {
   console.error('Uhåndtert feil:', err);
@@ -455,3 +466,6 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Serveren kjører på port ${port}`);
 });
+
+// Initialiser databasetabeller
+initDb();

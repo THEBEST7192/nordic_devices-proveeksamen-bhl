@@ -1,0 +1,66 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: nettside-mal-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nettside_mal}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-nettside_mal}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    container_name: nettside-mal-backend
+    restart: unless-stopped
+    ports:
+      - "6767:6767"
+    environment:
+      NODE_ENV: production
+      PORT: 6767
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: nettside_mal
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+      MESSAGE_ENCRYPTION_KEY: ${MESSAGE_ENCRYPTION_KEY}
+      RESERVATION_RETENTION_DAYS: ${RESERVATION_RETENTION_DAYS:-1}
+    depends_on:
+      - db
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    container_name: nettside-mal-frontend
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    environment:
+      VITE_API_URL: http://localhost:6767
+      RESERVATION_RETENTION_DAYS: ${RESERVATION_RETENTION_DAYS:-1}
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: nettside-mal-network
