@@ -164,7 +164,7 @@ function App() {
     setSubmitStatus(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:6767';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiUrl}/api/reservations`, {
         method: 'POST',
         headers: {

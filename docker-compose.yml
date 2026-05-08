@@ -52,8 +52,10 @@ services:
     ports:
       - "8001:80"
     environment:
-      VITE_API_URL: http://localhost:6767
+      VITE_API_URL: http://host.docker.internal:6767
       RESERVATION_RETENTION_DAYS: ${RESERVATION_RETENTION_DAYS:-1}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - backend
 

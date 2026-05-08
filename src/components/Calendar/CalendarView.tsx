@@ -19,7 +19,7 @@ function PublicCalendar() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:6767';
+        const apiUrl = import.meta.env.VITE_API_URL || '';
         const response = await fetch(`${apiUrl}/api/reservations/public`);
         if (response.ok) {
           const data = await response.json();
@@ -99,7 +99,7 @@ function DoctorCalendar() {
   useEffect(() => {
     const checkDoctors = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:6767';
+        const apiUrl = import.meta.env.VITE_API_URL || '';
         const response = await fetch(`${apiUrl}/api/doctors/check`);
         if (response.ok) {
           const data = await response.json();
@@ -114,7 +114,7 @@ function DoctorCalendar() {
 
   const fetchAppointments = async (user?: string, pass?: string) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:6767';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiUrl}/api/reservations`, {
         headers: {
           'x-username': user || username,
@@ -152,7 +152,7 @@ function DoctorCalendar() {
     setLoginError('');
     
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:6767';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiUrl}/api/login`, {
         method: 'POST',
         headers: {
