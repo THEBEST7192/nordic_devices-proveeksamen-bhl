@@ -1,4 +1,4 @@
-import sql from './db.js';
+import { query } from './db.js';
 import bcrypt from 'bcrypt';
 import readline from 'readline';
 
@@ -60,27 +60,24 @@ async function createDoctor() {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Sjekk om bruker allerede eksisterer
-    const existing = await sql`SELECT * FROM doctors WHERE username = ${username}`;
+    const existing = await query('SELECT * FROM doctors WHERE username = ?', [username]);
     if (existing.length > 0) {
       console.log(`Feil: Brukeren "${username}" eksisterer allerede.`);
       process.exit(1);
     }
 
     // Opprett ny lege
-    await sql`
-      INSERT INTO doctors (username, password_hash) 
-      VALUES (${username}, ${passwordHash})
-    `;
-
+    await query(
+      'INSERT INTO doctors (username, password_hash) VALUES (?, ?)',
+      [username, passwordHash]
+    );
+    
     console.log(`Lege "${username}" ble opprettet!`);
-    console.log(`Brukernavn: ${username}`);
-    console.log(`Passord: ${password}`);
+    process.exit(1)
     
   } catch (error) {
     console.error('Feil ved opprettelse av lege:', error);
     process.exit(1);
-  } finally {
-    await sql.end();
   }
 }
 

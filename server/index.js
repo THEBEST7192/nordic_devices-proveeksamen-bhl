@@ -4,7 +4,7 @@ import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import sql from './db.js';
+import { query, transaction } from './db.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -121,121 +121,128 @@ app.use(express.static(path.join(__dirname, '..', 'dist')));
 const initDb = async () => {
   try {
     // 1. Opprett tabeller for normaliserte data hvis de ikke eksisterer
-    await sql`
+    await query(`
       CREATE TABLE IF NOT EXISTS emails (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL
-      );
-    `;
-    await sql`
+      )
+    `);
+    await query(`
       CREATE TABLE IF NOT EXISTS phones (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         phone VARCHAR(255) UNIQUE NOT NULL
-      );
-    `;
-    await sql`
+      )
+    `);
+    await query(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        email_id INTEGER REFERENCES emails(id),
-        phone_id INTEGER REFERENCES phones(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
+        email_id INT,
+        phone_id INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (email_id) REFERENCES emails(id),
+        FOREIGN KEY (phone_id) REFERENCES phones(id)
+      )
+    `);
 
-    await sql`
+    await query(`
       CREATE TABLE IF NOT EXISTS doctors (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
+      )
+    `);
     
     // 2. Sjekk om det finnes noen leger, hvis ikke skriv ut en advarsel
-    const doctors = await sql`SELECT COUNT(*) FROM doctors`;
+    const doctors = await query('SELECT COUNT(*) as count FROM doctors');
     if (parseInt(doctors[0].count) === 0) {
       console.warn('ADVARSEL: Ingen leger er registrert i databasen. Systemet vil ikke tillate innlogging.');
       console.warn('Vennligst opprett en lege manuelt i "doctors"-tabellen.');
     }
-    const tableInfo = await sql`
+    
+    // Sjekk om reservations-tabellen har gammel struktur (med email-kolonne)
+    const [tableInfo] = await query(`
       SELECT column_name 
       FROM information_schema.columns 
-      WHERE table_name = 'reservations' AND column_name = 'email';
-    `;
+      WHERE table_name = 'reservations' AND column_name = 'email'
+    `);
 
-    if (tableInfo.length > 0) {
+    if (tableInfo) {
       console.log('Gammel reservations-tabell oppdaget. Starter datamigrering...');
       
-      await sql.begin(async (sql) => {
+      await transaction(async (conn) => {
         // Hent alle gamle reservasjoner
-        const oldReservations = await sql`SELECT * FROM reservations`;
+        const oldReservations = await conn.execute('SELECT * FROM reservations');
         
         // Midlertidig tabell for å holde den nye strukturen
-        await sql`
+        await conn.execute(`
           CREATE TABLE reservations_new (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
             date DATE NOT NULL,
             time TIME NOT NULL,
             message TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
           )
-        `;
+        `);
 
-        for (const res of oldReservations) {
+        for (const res of oldReservations[0]) {
           const isEmail = res.email.includes('@');
           let emailId = null;
           let phoneId = null;
 
           if (isEmail) {
-            const [emailRow] = await sql`
-              INSERT INTO emails (email) VALUES (${res.email})
-              ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email
-              RETURNING id
-            `;
-            emailId = emailRow.id;
+            await conn.execute(
+              'INSERT INTO emails (email) VALUES (?) ON DUPLICATE KEY UPDATE email = VALUES(email)',
+              [res.email]
+            );
+            const [emailRows] = await conn.execute('SELECT id FROM emails WHERE email = ?', [res.email]);
+            emailId = emailRows[0].id;
           } else {
-            const [phoneRow] = await sql`
-              INSERT INTO phones (phone) VALUES (${res.email})
-              ON CONFLICT (phone) DO UPDATE SET phone = EXCLUDED.phone
-              RETURNING id
-            `;
-            phoneId = phoneRow.id;
+            await conn.execute(
+              'INSERT INTO phones (phone) VALUES (?) ON DUPLICATE KEY UPDATE phone = VALUES(phone)',
+              [res.email]
+            );
+            const [phoneRows] = await conn.execute('SELECT id FROM phones WHERE phone = ?', [res.email]);
+            phoneId = phoneRows[0].id;
           }
 
           // Opprett bruker for denne reservasjonen
-          const [userRow] = await sql`
-            INSERT INTO users (name, email_id, phone_id)
-            VALUES (${res.name}, ${emailId}, ${phoneId})
-            RETURNING id
-          `;
+          await conn.execute(
+            'INSERT INTO users (name, email_id, phone_id) VALUES (?, ?, ?)',
+            [res.name, emailId, phoneId]
+          );
+          const [userRows] = await conn.execute('SELECT LAST_INSERT_ID() as id');
+          const userId = userRows[0].id;
           
           // Sett inn i den nye reservasjonstabellen
-          await sql`
-            INSERT INTO reservations_new (user_id, date, time, message, created_at)
-            VALUES (${userRow.id}, ${res.date}, ${res.time}, ${encryptMessage(res.message)}, ${res.created_at})
-          `;
+          await conn.execute(
+            'INSERT INTO reservations_new (user_id, date, time, message, created_at) VALUES (?, ?, ?, ?, ?)',
+            [userId, res.date, res.time, encryptMessage(res.message), res.created_at]
+          );
         }
 
         // Slett gammel tabell og gi nytt navn til den nye
-        await sql`DROP TABLE reservations`;
-        await sql`ALTER TABLE reservations_new RENAME TO reservations`;
+        await conn.execute('DROP TABLE reservations');
+        await conn.execute('ALTER TABLE reservations_new RENAME TO reservations');
       });
       
       console.log('Migrering fullført.');
     } else {
       // Hvis tabellen ikke eksisterer i det hele tatt, opprett den med det nye skjemaet
-      await sql`
+      await query(`
         CREATE TABLE IF NOT EXISTS reservations (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT,
           date DATE NOT NULL,
           time TIME NOT NULL,
           message TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-      `;
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+      `);
     }
     
     console.log('Database initialisert med normalisert skjema');
@@ -257,30 +264,30 @@ const cleanupIntervalMs = 24 * 60 * 60 * 1000;
 
 const cleanupOldReservations = async () => {
   try {
-    await sql.begin(async (sql) => {
+    await transaction(async (conn) => {
       // 1. Slett gamle reservasjoner
-      await sql`
-        DELETE FROM reservations
-        WHERE CURRENT_DATE - date > ${reservationRetentionDays}
-      `;
+      await conn.execute(
+        'DELETE FROM reservations WHERE DATEDIFF(CURRENT_DATE, date) > ?',
+        [reservationRetentionDays]
+      );
       
       // 2. Slett brukere som ikke lenger har noen reservasjoner
-      await sql`
+      await conn.execute(`
         DELETE FROM users
         WHERE id NOT IN (SELECT user_id FROM reservations)
-      `;
+      `);
       
       // 3. Slett e-poster som ikke lenger er knyttet til noen bruker
-      await sql`
+      await conn.execute(`
         DELETE FROM emails
         WHERE id NOT IN (SELECT email_id FROM users WHERE email_id IS NOT NULL)
-      `;
+      `);
       
       // 4. Slett telefonnumre som ikke lenger er knyttet til noen bruker
-      await sql`
+      await conn.execute(`
         DELETE FROM phones
         WHERE id NOT IN (SELECT phone_id FROM users WHERE phone_id IS NOT NULL)
-      `;
+      `);
     });
     console.log(`Opprydding av gamle reservasjoner og tilhørende data fullført (oppbevaring ${reservationRetentionDays} dager)`);
   } catch (err) {
@@ -296,7 +303,7 @@ setInterval(() => {
 
 app.get('/api/doctors/check', async (req, res) => {
   try {
-    const result = await sql`SELECT COUNT(*) FROM doctors`;
+    const result = await query('SELECT COUNT(*) as count FROM doctors');
     const count = parseInt(result[0].count);
     res.json({ hasDoctors: count > 0 });
   } catch (err) {
@@ -312,9 +319,8 @@ app.post('/api/login', strictLimiter, async (req, res) => {
   }
 
   try {
-    const [doctor] = await sql`
-      SELECT * FROM doctors WHERE username = ${username}
-    `;
+    const doctors = await query('SELECT * FROM doctors WHERE username = ?', [username]);
+    const doctor = doctors[0];
 
     if (doctor && await bcrypt.compare(password, doctor.password_hash)) {
       res.json({ success: true });
@@ -336,43 +342,45 @@ app.post('/api/reservations', strictLimiter, async (req, res) => {
 
   try {
     // Start en transaksjon
-    const result = await sql.begin(async (sql) => {
+    const result = await transaction(async (conn) => {
       // Sjekk om det er e-post eller telefonnummer
       const isEmailAddress = email.includes('@');
       let emailId = null;
       let phoneId = null;
 
       if (isEmailAddress) {
-        const [emailRow] = await sql`
-          INSERT INTO emails (email) VALUES (${email})
-          ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email
-          RETURNING id
-        `;
-        emailId = emailRow.id;
+        await conn.execute(
+          'INSERT INTO emails (email) VALUES (?) ON DUPLICATE KEY UPDATE email = VALUES(email)',
+          [email]
+        );
+        const [emailRows] = await conn.execute('SELECT id FROM emails WHERE email = ?', [email]);
+        emailId = emailRows[0].id;
       } else {
-        const [phoneRow] = await sql`
-          INSERT INTO phones (phone) VALUES (${email})
-          ON CONFLICT (phone) DO UPDATE SET phone = EXCLUDED.phone
-          RETURNING id
-        `;
-        phoneId = phoneRow.id;
+        await conn.execute(
+          'INSERT INTO phones (phone) VALUES (?) ON DUPLICATE KEY UPDATE phone = VALUES(phone)',
+          [email]
+        );
+        const [phoneRows] = await conn.execute('SELECT id FROM phones WHERE phone = ?', [email]);
+        phoneId = phoneRows[0].id;
       }
 
       // Opprett en ny brukerpost for denne reservasjonen
-      const [userRow] = await sql`
-        INSERT INTO users (name, email_id, phone_id)
-        VALUES (${name}, ${emailId}, ${phoneId})
-        RETURNING id
-      `;
-      const userId = userRow.id;
+      await conn.execute(
+        'INSERT INTO users (name, email_id, phone_id) VALUES (?, ?, ?)',
+        [name, emailId, phoneId]
+      );
+      const [userRows] = await conn.execute('SELECT LAST_INSERT_ID() as id');
+      const userId = userRows[0].id;
 
       const encryptedMessage = encryptMessage(message);
-      const [reservation] = await sql`
-        INSERT INTO reservations (user_id, date, time, message) 
-        VALUES (${userId}, ${date}, ${time}, ${encryptedMessage}) 
-        RETURNING *
-      `;
-      return reservation;
+      await conn.execute(
+        'INSERT INTO reservations (user_id, date, time, message) VALUES (?, ?, ?, ?)',
+        [userId, date, time, encryptedMessage]
+      );
+      const [reservationRows] = await conn.execute(
+        'SELECT * FROM reservations WHERE id = LAST_INSERT_ID()'
+      );
+      return reservationRows[0];
     });
 
     res.status(201).json(result);
@@ -391,15 +399,14 @@ app.get('/api/reservations', async (req, res) => {
   }
 
   try {
-    const [doctor] = await sql`
-      SELECT * FROM doctors WHERE username = ${username}
-    `;
+    const doctors = await query('SELECT * FROM doctors WHERE username = ?', [username]);
+    const doctor = doctors[0];
 
     if (!doctor || !(await bcrypt.compare(password, doctor.password_hash))) {
       return res.status(401).json({ error: 'Uautorisert tilgang: Feil legitimasjon' });
     }
 
-    const reservations = await sql`
+    const reservations = await query(`
       SELECT 
         r.id, 
         u.name, 
@@ -415,7 +422,7 @@ app.get('/api/reservations', async (req, res) => {
       WHERE r.date > CURRENT_DATE 
       OR (r.date = CURRENT_DATE AND r.time >= CURRENT_TIME)
       ORDER BY r.date ASC, r.time ASC
-    `;
+    `);
     const decrypted = reservations.map((reservation) => ({
       ...reservation,
       message: decryptMessage(reservation.message)
@@ -432,12 +439,12 @@ app.get('/api/reservations', async (req, res) => {
 
 app.get('/api/reservations/public', async (req, res) => {
   try {
-    const reservations = await sql`
+    const reservations = await query(`
       SELECT date, time FROM reservations 
       WHERE date > CURRENT_DATE 
       OR (date = CURRENT_DATE AND time >= CURRENT_TIME)
       ORDER BY date ASC, time ASC
-    `;
+    `);
     res.json(reservations);
   } catch (err) {
     console.error('DATABASEFEIL på /api/reservations/public:', err);

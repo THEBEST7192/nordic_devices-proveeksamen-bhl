@@ -19,8 +19,8 @@
     "dotenv": "^17.2.3",
     "express": "^4.19.2",
     "express-rate-limit": "^8.2.1",
-    "pg": "^8.16.3",
-    "postgres": "^3.4.8"
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
