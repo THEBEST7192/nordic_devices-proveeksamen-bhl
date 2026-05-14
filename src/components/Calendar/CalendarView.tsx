@@ -20,7 +20,8 @@ function PublicCalendar() {
     const fetchAppointments = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || '';
-        const response = await fetch(`${apiUrl}/api/reservations/public`);
+        const url = apiUrl ? `${apiUrl}/api/reservations/public` : '/api/reservations/public';
+        const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
           // Ekstra filtrering i frontend for å sikre at vi kun viser fremtidige avtaler (fra og med inneværende time)
@@ -100,7 +101,8 @@ function DoctorCalendar() {
     const checkDoctors = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || '';
-        const response = await fetch(`${apiUrl}/api/doctors/check`);
+        const url = apiUrl ? `${apiUrl}/api/doctors/check` : '/api/doctors/check';
+        const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
           setHasDoctors(data.hasDoctors);
@@ -115,7 +117,8 @@ function DoctorCalendar() {
   const fetchAppointments = async (user?: string, pass?: string) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/reservations`, {
+      const url = apiUrl ? `${apiUrl}/api/reservations` : '/api/reservations';
+      const response = await fetch(url, {
         headers: {
           'x-username': user || username,
           'x-password': pass || password
@@ -153,7 +156,8 @@ function DoctorCalendar() {
     
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/login`, {
+      const url = apiUrl ? `${apiUrl}/api/login` : '/api/login';
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

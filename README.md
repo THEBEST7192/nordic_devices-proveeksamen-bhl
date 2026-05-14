@@ -14,7 +14,7 @@ En mal/template for å bygge moderne nettsider med React, TypeScript og Tailwind
 ## Teknologier
 
 - **Frontend**: Vite, React, TypeScript, Tailwind CSS v4, Framer Motion, Lucide React.
-- **Backend**: Node.js, Express, PostgreSQL, Cors, Dotenv.
+- **Backend**: Node.js, Express, MySQL, Dotenv, bcrypt/bcryptjs, express-rate-limit.
 
 ## Kom i gang
 
@@ -22,7 +22,7 @@ En mal/template for å bygge moderne nettsider med React, TypeScript og Tailwind
 
 **For lokal utvikling:**
 - Node.js installert
-- En PostgreSQL-database (f.eks. via Supabase, Render, eller lokalt)
+- En MySQL-database (f.eks. via Docker, eller lokalt)
 
 **For Docker:**
 ```bash
@@ -43,7 +43,7 @@ sudo apt install -y docker.io docker-compose nodejs npm
    ```
 3. Konfigurer miljøvariabler:
    - Endre navn på `.env.example` til `.env`
-   - Oppdater `DATABASE_URL` med din PostgreSQL-tilkoblingsstreng.
+   - Oppdater `DATABASE_URL` med din MySQL-tilkoblingsstreng.
    - For å generere krypteringsnøkkel kan du bruke `openssl rand -base64 32` (kan kjøres i WSL) og lagre verdien i `MESSAGE_ENCRYPTION_KEY`.
    - Valgfritt: sett `RESERVATION_RETENTION_DAYS` for hvor lenge gamle reservasjoner lagres (standard: `1` dag).
      - `0` = slett umiddelbart dagen etter behandling.
@@ -156,21 +156,23 @@ VITE_API_URL=http://localhost:6767
 - Database opprettes automatisk ved første oppstart via `server/index.js`
 - Tabeller blir opprettet automatisk når Docker container starter
 
+**Database konfigurasjon:**
+- **Produksjon**: MySQL på port 3306, database navn: `nettside_mal`
+- **Utvikling**: MySQL på port 3307, database navn: `nettside_mal_dev`
+
 ### Opprette Første Lege
 
 Systemet har ingen registreringsside, så første lege må opprettes manuelt:
 
-**Metode 1: Docker (anbefalt)**
+**For produksjonsdatabase:**
 ```bash
-cd server
-node create-doctor-docker.js
+npm run create-doctor
 # Følg promptene for brukernavn og passord
 ```
 
-**Metode 2: Lokal utvikling**
+**For utviklingsdatabase:**
 ```bash
-cd server
-node create-doctor.js
+npm run create-doctor:dev
 # Følg promptene for brukernavn og passord
 ```
 
@@ -204,7 +206,7 @@ npm run docker:down
 npm run docker:clean
 
 # Fjerne containers, images OG slette volumes
-npm run docker:clean:postgres
+npm run docker:clean:mysql
 ```
 
 ### Annet

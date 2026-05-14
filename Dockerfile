@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Nettside-Mal (Separate Frontend + Backend)
+# Multi-stage Dockerfile for Nettside-Mal (Separat Frontend + Backend)
 
 # Stage 1: Bygg frontend
 FROM node:22-alpine AS frontend-builder

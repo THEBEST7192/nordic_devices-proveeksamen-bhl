@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
@@ -65,29 +64,6 @@ const decryptMessage = (value) => {
 
 // Stol på proxy-headere (nødvendig for Cloudflare/proxy)
 app.set('trust proxy', 1);
-
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-  : ['http://localhost:8001', 'http://127.0.0.1:8001', 'https://helse.the-diddy.party'];
-
-console.log('Serveren starter med tillatte origins:', allowedOrigins);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    const normalizedOrigin = origin.replace(/[\s`"']/g, '').replace(/\/$/, '');
-    if (allowedOrigins.includes(normalizedOrigin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS AVVIST: "${origin}" er ikke i [${allowedOrigins.join(', ')}]`);
-      callback(null, false);
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
 
 // Generell rate limiter for alle forespørsler
 const globalLimiter = rateLimit({

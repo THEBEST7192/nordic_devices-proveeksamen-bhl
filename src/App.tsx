@@ -165,7 +165,8 @@ function App() {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/reservations`, {
+      const url = apiUrl ? `${apiUrl}/api/reservations` : '/api/reservations';
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

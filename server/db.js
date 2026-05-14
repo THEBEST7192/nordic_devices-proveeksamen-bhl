@@ -7,12 +7,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Last miljøvariabler før databasen initialiseres
-dotenv.config({ path: path.resolve(__dirname, '.env') });
-dotenv.config({ path: path.resolve(__dirname, '.env.local'), override: true });
-
-// Last deretter fra prosjektrot (for Docker)
-dotenv.config({ path: path.resolve(__dirname, '..', '.env'), override: true });
-dotenv.config({ path: path.resolve(__dirname, '..', '.env.local'), override: true });
+// Bruk kun .env.development for utviklingsmiljø ellers bruk .env for produksjonsmiljø
+if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env.development') });
+} else {
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+}
 
 // Bygg databasekonfigurasjon fra miljøvariabler
 const dbHost = process.env.DB_HOST || 'localhost';

@@ -7,14 +7,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: nettside_mal
-      MYSQL_USER: appuser
+      MYSQL_USER: not_root
       MYSQL_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "not_root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,12 +35,13 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: nettside_mal
-      DB_USER: root
+      DB_USER: not_root
       DB_PASSWORD: ${DB_ROOT_PASSWORD}
       MESSAGE_ENCRYPTION_KEY: ${MESSAGE_ENCRYPTION_KEY}
       RESERVATION_RETENTION_DAYS: ${RESERVATION_RETENTION_DAYS:-1}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   # Frontend Service
   frontend:
@@ -52,8 +53,6 @@ services:
     restart: unless-stopped
     ports:
       - "8001:80"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       - backend
 
@@ -64,3 +63,4 @@ volumes:
 networks:
   default:
     name: nettside-mal-network
+    driver: bridge
