@@ -1,6 +1,6 @@
-# Nettside-Mal
+# Nordic Devices Proveeksamen
 
-En mal/template for å bygge moderne nettsider med React, TypeScript og Tailwind CSS v4. Dette er en generell mal basert på [Katta-Helse](https://github.com/THEBEST7192/Katta-Helse) - som ble opprinnelig utviklet for en halvårs vurderingsoppgave.
+En nettside for Nordic Devices med React, TypeScript og Tailwind CSS v4.
 
 ## Funksjoner
 
@@ -157,8 +157,8 @@ VITE_API_URL=http://localhost:6767
 - Tabeller blir opprettet automatisk når Docker container starter
 
 **Database konfigurasjon:**
-- **Produksjon**: MySQL på port 3306, database navn: `nettside_mal`
-- **Utvikling**: MySQL på port 3307, database navn: `nettside_mal_dev`
+- **Produksjon**: MySQL på port 3306, database navn: `nordic_devices_proveeksamen`
+- **Utvikling**: MySQL på port 3307, database navn: `nordic_devices_proveeksamen_dev`
 
 ### Opprette Første Lege
 

@@ -1,0 +1,78 @@
+{
+  "company": "Nordic Devices AS",
+  "generated": "2026-03-01",
+  "inventory": [
+    {
+      "id": 1,
+      "name": "Laptop Dell Latitude 5440",
+      "category": "PC",
+      "status": "available",
+      "location": "Lager Hamar",
+      "purchase_date": "2024-08-15",
+      "value_nok": 14500
+    },
+    {
+      "id": 2,
+      "name": "HP EliteDesk 800 G6",
+      "category": "Stasjonær PC",
+      "status": "rented",
+      "location": "Kunde - Oslo",
+      "purchase_date": "2023-11-20",
+      "value_nok": 9800
+    },
+    {
+      "id": 3,
+      "name": "UniFi 24-port Switch",
+      "category": "Nettverk",
+      "status": "available",
+      "location": "Lager Hamar",
+      "purchase_date": "2025-01-10",
+      "value_nok": 5200
+    },
+    {
+      "id": 4,
+      "name": "UniFi Access Point U6-Lite",
+      "category": "Nettverk",
+      "status": "rented",
+      "location": "Kunde - Lillehammer",
+      "purchase_date": "2024-06-05",
+      "value_nok": 1600
+    },
+    {
+      "id": 5,
+      "name": "Lenovo ThinkPad T14",
+      "category": "PC",
+      "status": "maintenance",
+      "location": "Serviceverksted",
+      "purchase_date": "2023-09-12",
+      "value_nok": 13200
+    },
+    {
+      "id": 6,
+      "name": "Samsung 27\" Skjerm",
+      "category": "Tilbehør",
+      "status": "available",
+      "location": "Lager Hamar",
+      "purchase_date": "2024-02-18",
+      "value_nok": 3200
+    },
+    {
+      "id": 7,
+      "name": "Raspberry Pi 5",
+      "category": "Utvikling",
+      "status": "rented",
+      "location": "Kunde - Elverum",
+      "purchase_date": "2025-02-01",
+      "value_nok": 900
+    },
+    {
+      "id": 8,
+      "name": "Synology NAS DS220+",
+      "category": "Server",
+      "status": "available",
+      "location": "Datasenter",
+      "purchase_date": "2023-05-30",
+      "value_nok": 4800
+    }
+  ]
+}

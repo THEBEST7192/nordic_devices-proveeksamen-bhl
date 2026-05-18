@@ -2,11 +2,11 @@ services:
   # MySQL Database
   db:
     image: mysql:8.0
-    container_name: nettside-mal-db
+    container_name: nordic_devices_proveeksamen-db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: nettside_mal
+      MYSQL_DATABASE: nordic_devices_proveeksamen
       MYSQL_USER: not_root
       MYSQL_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
     volumes:
@@ -25,7 +25,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: backend
-    container_name: nettside-mal-backend
+    container_name: nordic_devices_proveeksamen-backend
     restart: unless-stopped
     ports:
       - "6767:6767"
@@ -34,7 +34,7 @@ services:
       PORT: 6767
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: nettside_mal
+      DB_NAME: nordic_devices_proveeksamen
       DB_USER: not_root
       DB_PASSWORD: ${DB_ROOT_PASSWORD}
       MESSAGE_ENCRYPTION_KEY: ${MESSAGE_ENCRYPTION_KEY}
@@ -49,7 +49,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: frontend
-    container_name: nettside-mal-frontend
+    container_name: nordic_devices_proveeksamen-frontend
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -62,5 +62,5 @@ volumes:
 
 networks:
   default:
-    name: nettside-mal-network
+    name: nordic_devices-proveeksamen-bhl-network
     driver: bridge
