@@ -83,7 +83,7 @@ export const PrivacyPolicy = ({ onBack }: PrivacyPolicyProps) => {
           </section>
 
           <div className="pt-8 border-t border-slate-100 text-slate-500 text-sm italic">
-            Dette er en demoside for eksamen. I en ekte produksjonssetting ville denne erklæringen vært juridisk bindende og tilpasset selskapets faktiske databehandling.
+            Dette er en demoside for eksamen, og er ikke den offisielle nettsiden for Nordic Devices AS.
           </div>
         </motion.div>
       </div>

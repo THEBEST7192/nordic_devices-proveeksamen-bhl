@@ -329,14 +329,14 @@ function App() {
         {currentView === 'landing' ? (
           <>
             {/* Hero-seksjon */}
-            <section id="home" className="relative overflow-hidden bg-white pt-36 pb-28 lg:pt-32 lg:pb-40">
+            <section id="home" className="relative overflow-hidden bg-white pt-40 pb-36 lg:pt-44 lg:pb-52">
               <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <motion.div {...fadeIn}>
-                  <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
+                  <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-8 leading-[1.1]">
                     Nordic <span className="text-primary-500">Devices</span>
-                    <span className="block text-2xl sm:text-3xl text-slate-400 mt-2">IT-løsninger for små og store bedrifter</span>
+                    <span className="block text-3xl sm:text-4xl lg:text-5xl text-slate-400 mt-4 tracking-tight font-bold">IT-løsninger for små og store bedrifter</span>
                   </h1>
-                  <p className="max-w-2xl mx-auto text-xl text-slate-600 mb-10 leading-relaxed">
+                  <p className="max-w-3xl mx-auto text-xl sm:text-2xl text-slate-600 mb-12 leading-relaxed font-medium">
                     Vi leverer og administrerer IT-utstyr og digitale tjenester skreddersydd for din bedrift.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
