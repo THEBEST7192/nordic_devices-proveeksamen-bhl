@@ -133,8 +133,8 @@ const initDb = async () => {
     // 2. Sjekk om det finnes noen leger, hvis ikke skriv ut en advarsel
     const doctors = await query('SELECT COUNT(*) as count FROM doctors');
     if (parseInt(doctors[0].count) === 0) {
-      console.warn('ADVARSEL: Ingen leger er registrert i databasen. Systemet vil ikke tillate innlogging.');
-      console.warn('Vennligst opprett en lege manuelt i "doctors"-tabellen.');
+      console.warn('ADVARSEL: Ingen administratorer er registrert i databasen. Systemet vil ikke tillate innlogging.');
+      console.warn('Vennligst opprett en administrator manuelt i "doctors"-tabellen.');
     }
     
     // Sjekk om reservations-tabellen har gammel struktur (med email-kolonne)

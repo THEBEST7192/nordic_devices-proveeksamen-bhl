@@ -40,7 +40,7 @@ async function prompt(question, hidden = false) {
 }
 
 async function createDoctor() {
-  console.log('Opprett ny lege-konto');
+  console.log('Opprett ny administrator');
   console.log('');
 
   const username = await prompt('Brukernavn: ');
@@ -66,17 +66,17 @@ async function createDoctor() {
       process.exit(1);
     }
 
-    // Opprett ny lege
+    // Opprett ny administrator
     await query(
       'INSERT INTO doctors (username, password_hash) VALUES (?, ?)',
       [username, passwordHash]
     );
     
-    console.log(`Lege "${username}" ble opprettet!`);
+    console.log(`Admin "${username}" ble opprettet!`);
     process.exit(1)
     
   } catch (error) {
-    console.error('Feil ved opprettelse av lege:', error);
+    console.error('Feil ved opprettelse av administrator:', error);
     process.exit(1);
   }
 }

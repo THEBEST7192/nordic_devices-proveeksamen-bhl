@@ -13,9 +13,9 @@ Dette dokumentet lister alle porter som brukes av applikasjonen i ulike miljøer
 | Cloudflare Tunnel | - | 2918 | Ekstern tilgangstunnel |
 
 ### Databasekonfigurasjon
-- **Databasenavn**: `nettside_mal_dev`
+- **Databasenavn**: `nordic_devices_proveeksamen_dev`
 - **Standardbruker**: `not_root`
-- **Tilkobling**: `localhost:3307/nettside_mal_dev`
+- **Tilkobling**: `localhost:3307/nordic_devices_proveeksamen_dev`
 
 ### Tilgangs-URLer
 - **Frontend**: http://localhost:5173
@@ -34,9 +34,9 @@ Dette dokumentet lister alle porter som brukes av applikasjonen i ulike miljøer
 | Cloudflare Tunnel | - | 2917 | Ekstern tilgangstunnel |
 
 ### Databasekonfigurasjon
-- **Databasenavn**: `nettside_mal`
+- **Databasenavn**: `nordic_devices_proveeksamen`
 - **Standardbruker**: `not_root`
-- **Tilkobling**: `localhost:3306/nettside_mal`
+- **Tilkobling**: `localhost:3306/nordic_devices_proveeksamen`
 
 ### Tilgangs-URLer
 - **Frontend**: http://localhost:8001
@@ -47,11 +47,11 @@ Dette dokumentet lister alle porter som brukes av applikasjonen i ulike miljøer
 ## Docker-nettverk
 
 ### Utvikling
-- **Nettverk**: `nettside-mal-dev-network`
+- **Nettverk**: `nordic_devices-proveeksamen-bhl-dev-network`
 - **Intern kommunikasjon**: Tjenester kommuniserer ved bruk av containerporter
 
 ### Produksjon  
-- **Nettverk**: `nettside-mal-network`
+- **Nettverk**: `nordic_devices-proveeksamen-bhl-network`
 - **Intern kommunikasjon**: Tjenester kommuniserer ved bruk av containerporter
 
 
@@ -62,4 +62,4 @@ Utviklings- og produksjonsmiljøer bruker forskjellige porter for å unngå konf
 - **Frontend**: Utvikling (5173) vs Prod (8001)
 - **Backend**: Utvikling (6768) vs Prod (6767)
 - **Database**: Utvikling (3307) vs Prod (3306)
-- **Cloudflare Tunnel**: Utvikling (2917) vs Prod (2918)
+- **Cloudflare Tunnel**: Utvikling (2918) vs Prod (2917)

@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'development') {
 // Bygg databasekonfigurasjon fra miljøvariabler
 const dbHost = process.env.DB_HOST || 'localhost';
 const dbPort = parseInt(process.env.DB_PORT || '3306', 10);
-const dbName = process.env.DB_NAME || 'nettside_mal';
+const dbName = process.env.DB_NAME || 'nordic_devices_proveeksamen';
 const dbUser = process.env.DB_USER || 'root';
 const dbPassword = process.env.DB_PASSWORD || process.env.DB_ROOT_PASSWORD;
 

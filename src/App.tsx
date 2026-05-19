@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Phone, MapPin, MessageCircle, Heart, Info, ArrowRight, ExternalLink, Menu, X, Calendar, Clock, User, Mail, ChevronDown, ShieldCheck } from 'lucide-react';
+import { Phone, MapPin, Info, ArrowRight, ExternalLink, Menu, X, User, Mail, ChevronDown, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarView } from './components/Calendar/CalendarView';
 
 const navLinks = [
   { name: 'Hjem', id: 'home', view: 'landing' as const },
   { name: 'Tjenester', id: 'services', view: 'landing' as const },
-  { name: 'Bestill time', id: 'reservation', view: 'landing' as const },
-  { name: 'Snapchat', id: 'about', view: 'landing' as const },
+  { name: 'Kontakt', id: 'contact', view: 'landing' as const },
+  { name: 'Om oss', id: 'about', view: 'landing' as const },
   { name: 'FAQ', id: 'faq', view: 'landing' as const },
-  { name: 'Kalender', id: 'calendar', view: 'calendar' as const },
+  { name: 'Status', id: 'calendar', view: 'calendar' as const },
 ];
 
 function App() {
@@ -19,8 +19,6 @@ function App() {
   const [reservation, setReservation] = useState({
     name: '',
     email: '',
-    date: '',
-    time: '',
     message: ''
   });
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
@@ -54,14 +52,6 @@ function App() {
     };
     tryScroll();
   }, [scrollToSection]);
-
-  const handleSnapchatCtaClick = () => {
-    setCurrentView('landing');
-    setIsMenuOpen(false);
-    setSelectedNav('about');
-
-    window.location.hash = 'about';
-  };
 
   const handleNavClick = (view: 'landing' | 'calendar', id: string) => {
     setCurrentView(view);
@@ -123,38 +113,6 @@ function App() {
   const handleReservationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Valider åpningstider
-    const selectedDate = new Date(reservation.date);
-    const day = selectedDate.getDay(); // 0 = Søndag, 1 = Mandag, osv.
-    const [hour, minute] = reservation.time.split(':').map(Number);
-
-    let isValidTime = false;
-    let errorMessage = "";
-
-    if (day === 0 || day === 6) {
-      errorMessage = "Vi har stengt i helgene. Vennligst velg en hverdag.";
-    } else {
-      if ((day === 1 || day === 2 || day === 4)) {
-        if (hour >= 9 && hour < 14) isValidTime = true;
-        if (hour === 14 && minute === 0) isValidTime = true;
-      } else if (day === 3) {
-        if (hour >= 9 && hour < 13) isValidTime = true;
-        if (hour === 13 && minute === 0) isValidTime = true;
-      } else if (day === 5) {
-        if (hour >= 9 && hour < 11) isValidTime = true;
-        if (hour === 11 && minute === 0) isValidTime = true;
-      }
-      
-      if (!isValidTime && !errorMessage) {
-        errorMessage = `Vi har stengt på det valgte tidspunktet. Se åpningstidene våre lenger ned.`;
-      }
-    }
-
-    if (!isValidTime) {
-      setSubmitStatus({ type: 'error', message: errorMessage });
-      return;
-    }
-
     if (!privacyAccepted) {
       setSubmitStatus({ type: 'error', message: 'Du må godta personvernerklæringen for å sende inn skjemaet.' });
       return;
@@ -175,8 +133,8 @@ function App() {
       });
 
       if (response.ok) {
-        setSubmitStatus({ type: 'success', message: 'Takk! Din reservasjon er mottatt.' });
-        setReservation({ name: '', email: '', date: '', time: '', message: '' });
+        setSubmitStatus({ type: 'success', message: 'Takk! Din henvendelse er mottatt.' });
+        setReservation({ name: '', email: '', message: '' });
         setPrivacyAccepted(false);
       } else {
         throw new Error('Noe gikk galt. Prøv igjen senere.');
@@ -186,58 +144,6 @@ function App() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const getAvailableHours = () => {
-    if (!reservation.date) return [];
-    
-    const selectedDate = new Date(reservation.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const isToday = selectedDate.getTime() === today.getTime();
-    const currentHour = new Date().getHours();
-
-    const day = selectedDate.getDay();
-    let hours: string[] = [];
-    
-    if (day === 1 || day === 2 || day === 4) hours = ['09', '10', '11', '12', '13', '14'];
-    else if (day === 3) hours = ['09', '10', '11', '12', '13'];
-    else if (day === 5) hours = ['09', '10', '11'];
-    
-    // Hvis det er i dag, vis kun nåværende time og fremover
-    if (isToday) {
-      return hours.filter(h => parseInt(h) >= currentHour);
-    }
-    
-    return hours;
-  };
-
-  const getAvailableMinutes = (selectedHour: string) => {
-    if (!reservation.date || !selectedHour) return ['00', '15', '30', '45'];
-    
-    const selectedDate = new Date(reservation.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const isToday = selectedDate.getTime() === today.getTime();
-    const currentHour = new Date().getHours();
-    const currentMinute = new Date().getMinutes();
-
-    const day = selectedDate.getDay();
-    
-    // Sjekk om dette er siste time for dagen
-    const isLastHour = 
-      ((day === 1 || day === 2 || day === 4) && selectedHour === '14') ||
-      (day === 3 && selectedHour === '13') ||
-      (day === 5 && selectedHour === '11');
-
-    const minutes = isLastHour ? ['00'] : ['00', '15', '30', '45'];
-
-    // Hvis det er i dag og nåværende time, vis kun fremtidige minutter
-    if (isToday && parseInt(selectedHour) === currentHour) {
-      return minutes.filter(m => parseInt(m) >= currentMinute);
-    }
-
-    return minutes;
   };
 
   const fadeIn = {
@@ -256,7 +162,7 @@ function App() {
               className="flex items-center gap-3 cursor-pointer group"
               onClick={() => handleNavClick('landing', 'home')}
             >
-              <img src="/logo.svg" alt="Hamar Katedralskole" className="h-10 w-auto group-hover:opacity-80 transition-opacity" />
+              <img src="/logo.svg" alt="Nordic Devices AS" className="h-10 w-auto group-hover:opacity-80 transition-opacity" />
             </div>
             
             {/* Desktop Meny */}
@@ -278,10 +184,10 @@ function App() {
                 );
               })}
               <button 
-                onClick={() => handleNavClick('landing', 'reservation')}
+                onClick={() => handleNavClick('landing', 'contact')}
                 className="bg-primary-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-600 transition-all shadow-sm active:scale-95"
               >
-                Snakk med oss
+                Kontakt oss
               </button>
             </div>
 
@@ -323,9 +229,9 @@ function App() {
                 })}
                 <button 
                   className="block w-full text-center bg-primary-500 text-white py-3 rounded-3xl font-bold"
-                  onClick={() => handleNavClick('landing', 'reservation')}
+                  onClick={() => handleNavClick('landing', 'contact')}
                 >
-                  Snakk med oss
+                  Kontakt oss
                 </button>
               </div>
             </motion.div>
@@ -341,27 +247,26 @@ function App() {
               <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <motion.div {...fadeIn}>
                   <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
-                    Skolehelse<span className="text-primary-500">tjenesten</span>
-                    <span className="block text-2xl sm:text-3xl text-slate-400 mt-2">Hamar katedralskole</span>
+                    Nordic <span className="text-primary-500">Devices</span>
+                    <span className="block text-2xl sm:text-3xl text-slate-400 mt-2">IT-løsninger for små og store bedrifter</span>
                   </h1>
                   <p className="max-w-2xl mx-auto text-xl text-slate-600 mb-10 leading-relaxed">
-                    Du kan snakke med oss om alt som har med din helse å gjøre: psykisk helse, fysisk helse, seksualitet og tester for kjønnssykdommer.
+                    Vi leverer og administrerer IT-utstyr og digitale tjenester skreddersydd for din bedrift.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
-                      onClick={handleSnapchatCtaClick}
+                      onClick={() => handleNavClick('landing', 'contact')}
                       className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-primary-500 text-white font-semibold text-lg hover:bg-primary-600 transition-all shadow-sm group"
                     >
                       <Phone className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                      Kontakt via SMS
+                      Kontakt oss
                     </button>
                     <button 
                       type="button"
-                      onClick={handleSnapchatCtaClick}
+                      onClick={() => handleNavClick('landing', 'services')}
                       className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-white text-slate-900 border-2 border-slate-200 font-semibold text-lg hover:border-primary-300 transition-all group"
                     >
-                      <MessageCircle className="mr-2 h-5 w-5 text-yellow-500 group-hover:scale-110 transition-transform" />
-                      Send oss en Snap
+                      Våre tjenester
                     </button>
                   </div>
                 </motion.div>
@@ -371,11 +276,17 @@ function App() {
             {/* Funksjoner / Ikoner */}
             <section id="services" className="pt-24 pb-12 bg-white">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-16">
+                  <h2 className="text-3xl font-bold mb-4">Våre tjenester</h2>
+                  <p className="text-slate-600 max-w-xl mx-auto">
+                    Moderne IT-løsninger for fremtidens bedrifter
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {[
-                    { icon: <Heart className="h-8 w-8 text-rose-500" />, title: "Psykisk Helse", desc: "Vi er her når livet føles vanskelig eller du trenger noen å lufte tankene med." },
-                    { icon: <Info className="h-8 w-8 text-blue-500" />, title: "Fysisk Helse", desc: "Spørsmål om kropp, søvn, mat eller små plager i hverdagen." },
-                    { icon: <Heart className="h-8 w-8 text-purple-500" />, title: "Seksualitet", desc: "Prevensjon, testing for kjønnssykdommer og samtaler om seksualitet." }
+                    { icon: <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>, title: "IT-drift og support", desc: "Levering og administrasjon av IT-utstyr og digitale tjenester for din bedrift." },
+                    { icon: <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>, title: "Sikre nettverksløsninger", desc: "Brannmurer, VPN, nettverkssegmentering og overvåkning for å beskytte din bedriftsdata." },
+                    { icon: <svg className="h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>, title: "Brukeradministrasjon", desc: "Active Directory, Microsoft 365 og SSO-løsninger for effektiv og sikker brukerstyring." }
                   ].map((item, i) => (
                     <motion.div 
                       key={i}
@@ -394,8 +305,8 @@ function App() {
               </div>
             </section>
 
-            {/* Reservasjonsseksjon */}
-            <section id="reservation" className="py-24 bg-primary-50">
+            {/* Kontaktseksjon */}
+            <section id="contact" className="py-24 bg-primary-50">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -404,9 +315,9 @@ function App() {
                   className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-primary-100"
                 >
                   <div className="text-center mb-10">
-                    <h2 className="text-3xl font-bold mb-4">Reserver en samtale</h2>
+                    <h2 className="text-3xl font-bold mb-4">Ta kontakt med oss</h2>
                     <p className="text-slate-600">
-                      Fyll ut skjemaet under for å be om en samtale. Vi tar kontakt med deg så snart som mulig.
+                      Fyll ut skjemaet under, så tar vi kontakt med deg innen 24 timer på hverdager.
                     </p>
                   </div>
 
@@ -442,77 +353,9 @@ function App() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label htmlFor="date" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-primary-500" /> Ønsket dato
-                        </label>
-                        <input
-                          type="date"
-                          id="date"
-                          required
-                          min={new Date().toISOString().split('T')[0]}
-                          value={reservation.date}
-                          onChange={(e) => {
-                            setReservation({ ...reservation, date: e.target.value, time: '' });
-                          }}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label htmlFor="time" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-primary-500" /> Ønsket tidspunkt
-                        </label>
-                        <div className="flex gap-2">
-                          <select
-                            id="time-hour"
-                            required
-                            value={reservation.time.split(':')[0] || ''}
-                            onChange={(e) => {
-                              const newHour = e.target.value;
-                              const availableMinutes = getAvailableMinutes(newHour);
-                              const currentMinute = reservation.time.split(':')[1] || '00';
-                              const finalMinute = availableMinutes.includes(currentMinute) ? currentMinute : '00';
-                              setReservation({ ...reservation, time: `${newHour}:${finalMinute}` });
-                            }}
-                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all bg-white"
-                          >
-                            <option value="" disabled>Time</option>
-                            {getAvailableHours().map(h => (
-                              <option key={h} value={h}>{h}</option>
-                            ))}
-                            {getAvailableHours().length === 0 && (
-                              <option disabled>Velg en hverdag først</option>
-                            )}
-                          </select>
-                          <div className="flex items-center text-slate-400 font-bold">:</div>
-                          <select
-                            id="time-minute"
-                            required
-                            value={reservation.time.split(':')[1] || ''}
-                            onChange={(e) => {
-                              const newMinute = e.target.value;
-                              const currentHour = reservation.time.split(':')[0] || '09';
-                              setReservation({ ...reservation, time: `${currentHour}:${newMinute}` });
-                            }}
-                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all bg-white"
-                          >
-                            <option value="" disabled>Min</option>
-                            {getAvailableMinutes(reservation.time.split(':')[0]).map(m => (
-                              <option key={m} value={m}>{m}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1.5 font-medium">
-                          <Info className="h-3.5 w-3.5 text-primary-500" />
-                          Vennligst velg et tidspunkt innenfor våre åpningstider.
-                        </p>
-                      </div>
-                    </div>
-
                     <div className="space-y-2">
                       <label htmlFor="message" className="text-sm font-semibold text-slate-700">
-                        Hva vil du snakke om? (Valgfritt)
+                        Hva trenger du hjelp med?
                       </label>
                       <textarea
                         id="message"
@@ -520,7 +363,7 @@ function App() {
                         value={reservation.message}
                         onChange={(e) => setReservation({ ...reservation, message: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
-                        placeholder="Skriv litt om hva du trenger hjelp til..."
+                        placeholder="Beskriv hva du trenger hjelp til..."
                       />
                     </div>
 
@@ -541,9 +384,9 @@ function App() {
                         <ShieldCheck className="h-5 w-5 text-primary-500 shrink-0 mt-0.5" />
                         <div className="text-xs text-slate-600 leading-relaxed">
                           <p className="font-semibold text-slate-700 mb-1">Personvern og sikkerhet</p>
-                          Informasjonen du sender her behandles konfidensielt av skolehelsetjenesten. 
+                          Informasjonen du sender her behandles konfidensielt. 
                           Vi lagrer kun nødvendige opplysninger for å kunne følge opp din henvendelse, 
-                          og dataene slettes automatisk {import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1'} {(import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1') === '1' ? 'dag' : 'dager'} etter at timen er passert.
+                          og dataene slettes automatisk {import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1'} {(import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1') === '1' ? 'dag' : 'dager'} etter at saken er avsluttet.
                         </div>
                       </div>
                       <label className="flex items-center gap-3 cursor-pointer group">
@@ -555,7 +398,7 @@ function App() {
                           className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500/20 cursor-pointer"
                         />
                         <span className="text-xs text-slate-600 group-hover:text-slate-900 transition-colors">
-                          Jeg forstår at mine opplysninger behandles konfidensielt og slettes automatisk {import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1'} {(import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1') === '1' ? 'dag' : 'dager'} etter at timen er passert.
+                          Jeg godtar at mine opplysninger behandles i henhold til personvernerklæringen.
                         </span>
                       </label>
                     </div>
@@ -576,70 +419,46 @@ function App() {
               </div>
             </section>
 
-            {/* Ansatte og kontakt */}
+            {/* Om oss */}
             <section id="about" className="pt-12 pb-0 bg-white">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-bold mb-8">Vi er her for deg</h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                <h2 className="text-3xl font-bold mb-8 text-center">Om Nordic Devices</h2>
+                <div className="max-w-3xl mx-auto">
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-6 rounded-3xl bg-primary-50 border border-primary-100">
-                          <h3 className="text-xl font-bold text-primary-900 mb-2">Helsesykepleier Marianne Buvik</h3>
-                          <p className="text-slate-700 mb-4">Bestill time via SMS med navn og fødselsdato.</p>
-                          <a href="tel:90269665" className="inline-flex items-center font-bold text-primary-600 hover:text-primary-700">
-                            <Phone className="mr-2 h-4 w-4" /> 902 69 665
-                          </a>
-                        </div>
-                        
-                        <div className="p-6 rounded-3xl bg-primary-50 border border-primary-100">
-                          <h3 className="text-xl font-bold text-primary-900 mb-2">Helsesykepleier Hanne Krøtøy</h3>
-                          <p className="text-slate-700 mb-4">Bestill time via SMS med navn og fødselsdato.</p>
-                          <a href="tel:91248594" className="inline-flex items-center font-bold text-primary-600 hover:text-primary-700">
-                            <Phone className="mr-2 h-4 w-4" /> 912 48 594
-                          </a>
-                        </div>
-                      </div>
+                    <div className="p-6 rounded-3xl bg-primary-50 border border-primary-100">
+                      <h3 className="text-xl font-bold text-primary-900 mb-4">Om selskapet</h3>
+                      <p className="text-slate-700 mb-4 leading-relaxed">
+                        Nordic Devices AS er et nystartet selskap som skal levere og administrere IT-utstyr 
+                        og digitale tjenester for små og store bedrifter.
+                      </p>
+                      <p className="text-slate-700 leading-relaxed">
+                        Selskapet tilbyr sikre nettverksløsninger og systemer for brukeradministrasjon. 
+                        Våre løsninger er godt dokumentert, sikre og enkle å videreutvikle.
+                      </p>
+                    </div>
 
                       <div className="p-6 rounded-3xl bg-white border border-slate-200">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center">
                             <Info className="h-4 w-4 text-primary-600" />
                           </div>
-                          <h4 className="font-bold text-slate-900">Åpningstider</h4>
+                          <h4 className="font-bold text-slate-900">Kontaktinformasjon</h4>
                         </div>
                         <div className="space-y-3">
                           <div className="flex justify-between items-center text-sm border-b border-slate-200 pb-2">
-                            <span className="text-slate-600">Mandag, tirsdag og torsdag</span>
-                            <span className="font-bold text-primary-700">09:00 – 14:00</span>
+                            <span className="text-slate-600">E-post</span>
+                            <span className="font-bold text-primary-700">post@nordicdevices.no</span>
                           </div>
                           <div className="flex justify-between items-center text-sm border-b border-slate-200 pb-2">
-                            <span className="text-slate-600">Onsdag</span>
-                            <span className="font-bold text-primary-700">09:00 – 13:00</span>
+                            <span className="text-slate-600">Telefon</span>
+                            <span className="font-bold text-primary-700">+47 400 00 000</span>
                           </div>
                           <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600">Fredag</span>
-                            <span className="font-bold text-primary-700">09:00 – 11:00</span>
+                            <span className="text-slate-600">Svar innen</span>
+                            <span className="font-bold text-primary-700">24 timer på hverdager</span>
                           </div>
                         </div>
                       </div>
-                  </div>
-
-                  <div id="snapchat" className="relative group">
-                    <div className="relative bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col items-center">
-                      <div className="flex items-center gap-4 mb-6 w-full">
-                        <div className="p-3 bg-yellow-400 rounded-2xl shrink-0">
-                          <MessageCircle className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-slate-900">Send oss en Snap</h3>
-                          <p className="text-slate-500 text-xs uppercase tracking-wider font-semibold">helsetjenesten</p>
-                        </div>
-                      </div>
-                      <div className="w-64 h-64 mb-6">
-                        <img src="/snapchat-qr.png" alt="Snapchat QR Code" className="w-full h-full object-contain" />
-                      </div>
-                      <p className="text-center text-slate-500 text-sm font-medium">Scan koden for å legge oss til</p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -651,31 +470,31 @@ function App() {
                 <div className="text-center mb-16">
                   <h2 className="text-3xl font-bold mb-4">Ofte stilte spørsmål</h2>
                   <p className="text-slate-600">
-                    Her finner du svar på det de fleste lurer på om skolehelsetjenesten.
+                    Her finner du svar på det de fleste lurer på om våre IT-tjenester.
                   </p>
                 </div>
 
                 <div className="space-y-4">
                   {[
                     {
-                      q: "Hva koster det å bruke skolehelsetjenesten?",
-                      a: "Alle tjenester hos skolehelsetjenesten er helt gratis for alle elever ved skolen."
+                      q: "Hva koster det å leie IT-drift fra dere?",
+                      a: "Vi tilbyr fleksible prisplaner tilpasset din bedrifts størrelse og behov. Kontakt oss for et uforpliktende tilbud."
                     },
                     {
-                      q: "Har dere taushetsplikt?",
-                      a: "Ja, alle som jobber her har streng taushetsplikt. Det du forteller oss blir mellom oss, med mindre det er fare for liv og helse."
+                      q: "Hvor lang tid tar det å komme i gang?",
+                      a: "De fleste løsninger kan settes opp i løpet av 1-3 dager. Større infrastrukturprosjekter planlegges i samarbeid med deg."
                     },
                     {
-                      q: "Må jeg bestille time på forhånd?",
-                      a: "Nei, du kan gjerne stikke innom på drop-in hvis døren er åpen. Men hvis du vil være sikker på å få snakket med oss, er det lurt å bestille en time her på nettsiden eller via SMS."
+                      q: "Tilbyr dere support utenom kontortid?",
+                      a: "Ja, vi har utvidet support med avtale om responstid. Vår standard support dekker hverdager 08-16."
                     },
                     {
-                      q: "Kan jeg få prevensjon hos dere?",
-                      a: "Ja, vi kan skrive ut resept på prevensjon (p-piller, p-stav, spiral osv.) og vi deler ut gratis kondomer."
+                      q: "Hvordan sikrer dere datasikkerhet?",
+                      a: "Vi bruker brannmurer, VPN, kryptering, automatiske sikkerhetsoppdateringer og overvåkning døgnet rundt. Alle løsninger følger gjeldende personvernforordning (GDPR)."
                     },
                     {
-                      q: "Hva kan jeg snakke med dere om?",
-                      a: "Du kan snakke med oss om alt! Ingenting er for lite eller for stort. Det kan være kjærlighetssorg, problemer hjemme, prevensjon, ensomhet, stress eller fysiske plager."
+                      q: "Kan jeg bruke mine egne programmer hos dere?",
+                      a: "Ja, vi støtter de fleste standard programvarelisenser og kan tilpasse miljøet til dine spesifikke behov."
                     }
                   ].map((faq, i) => (
                     <motion.div 
@@ -707,7 +526,7 @@ function App() {
                 <div className="text-center mb-16">
                   <h2 className="text-3xl font-bold mb-4 text-white">Hvor finner du oss?</h2>
                   <p className="text-primary-100 max-w-xl mx-auto text-lg">
-                    Vi holder til sentralt på skolen for at det skal være lett å stikke innom.
+                    Vi holder til i Oslo-området og betjener kunder over hele Norge.
                   </p>
                 </div>
                 <div className="bg-primary-800/50 rounded-3xl p-8 md:p-12 border border-primary-700/50 flex flex-col md:flex-row gap-12 items-center">
@@ -719,39 +538,39 @@ function App() {
                       <div>
                         <h3 className="text-xl font-bold mb-2 text-white">Besøksadresse</h3>
                         <div className="text-primary-100 leading-relaxed">
-                          <p className="text-white">Hamar Katedralskole</p>
-                          <p>Ringgata 235, 2315 Hamar</p>
-                          <p>Fløy 1, 3. etasje (ved Elevtjenesten)</p>
+                          <p className="text-white">Nordic Devices AS</p>
+                          <p>Hellavegen 1</p>
+                          <p>7504 Hell, Trondheim</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex gap-6">
                       <div className="w-12 h-12 rounded-2xl bg-primary-500 flex items-center justify-center shrink-0 shadow-sm">
-                        <Heart className="h-6 w-6" />
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z" /></svg>
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold mb-1 text-white">Drop-in</h3>
+                        <h3 className="text-xl font-bold mb-1 text-white">Fjernadministrasjon</h3>
                         <p className="text-primary-100 leading-relaxed">
-                          Kom innom hvis døra er åpen. Ingen sak er for liten.
+                          De fleste tjenester kan settes opp og driftes eksternt.
                         </p>
                       </div>
                     </div>
                     
                     <div className="pt-4">
                       <a 
-                        href="https://www.google.com/maps/search/?api=1&query=60.80578546070512,11.054866109563148" 
+                        href="https://www.google.com/maps/search/?api=1&query=63.47443279429126,10.914739728742665"
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-primary-100 font-bold hover:text-white transition-all border-b-2 border-primary-500 hover:border-white pb-1"
                       >
-                        Se skolen i kart <ArrowRight className="h-5 w-5" />
+                        Se i kart <ArrowRight className="h-5 w-5" />
                       </a>
                     </div>
                   </div>
                   <div className="flex-1 w-full aspect-video bg-primary-950/50 rounded-3xl border border-primary-700/50 overflow-hidden">
                     <iframe 
-                      src="https://maps.google.com/maps?q=60.80578546070512,11.054866109563148&z=17&output=embed" 
+                      src="https://maps.google.com/maps?q=63.47443279429126,10.914739728742665&z=15&output=embed"
                       width="100%" 
                       height="100%" 
                       style={{ border: 0 }} 
@@ -775,41 +594,41 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
             <div className="col-span-1 md:col-span-2">
-              <img src="/logo.svg" alt="Logo" className="h-10 w-auto mb-4" />
+              <img src="/logo.svg" alt="Nordic Devices AS" className="h-10 w-auto mb-4" />
               <p className="text-slate-500 max-w-sm text-sm">
-                En del av Innlandet fylkeskommune. Vi jobber for å fremme god helse og trivsel blant våre elever.
+                Nordic Devices AS leverer og administrerer IT-utstyr og digitale tjenester for små og mellomstore bedrifter.
               </p>
             </div>
             <div>
               <h4 className="font-bold mb-3">Lenker</h4>
               <ul className="space-y-2 text-slate-600">
-                <li><a href="#" className="hover:text-primary-500 transition-colors">Utdanningstilbud</a></li>
-                <li><a href="#" className="hover:text-primary-500 transition-colors">For elever</a></li>
-                <li><a href="#" className="hover:text-primary-500 transition-colors">Om skolen</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Hjem</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Tjenester</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Om oss</a></li>
                 <li><a href="#" className="hover:text-primary-500 transition-colors">Kontakt oss</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-3">Ressurser</h4>
               <ul className="space-y-2 text-slate-600">
-                <li><a href="https://innlandetfylke.no/om-fylkeskommunen/personvern/" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Personvern <ExternalLink className="h-3 w-3" /></a></li>
-                <li><a href="https://innlandetfylke.no/om-fylkeskommunen/informasjonskapsler/" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Informasjonskapsler <ExternalLink className="h-3 w-3" /></a></li>
-                <li><a href="https://uustatus.no/nb/erklaringer/publisert/947710bb-4ba7-43d7-8638-def79b4ab3dd" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Tilgjengelighetserklæring <ExternalLink className="h-3 w-3" /></a></li>
+                <li><a href="#" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Personvern <ExternalLink className="h-3 w-3" /></a></li>
+                <li><a href="#" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Informasjonskapsler <ExternalLink className="h-3 w-3" /></a></li>
+                <li><a href="#" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Tilgjengelighetserklæring <ExternalLink className="h-3 w-3" /></a></li>
               </ul>
             </div>
           </div>
           <div className="pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-400 text-xs italic">
-              Dette er en demoside, ikke den offisielle siden.
+              Dette er en demoside for eksamen, ikke en offisiell nettside for Nordic Devices AS.
             </p>
-            <div className="flex gap-6">
-              <a href="https://www.facebook.com/hamarkatedralskole/" target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors">
-                <span className="sr-only">Facebook</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <div className="flex items-center gap-6">
+              <a href="#" target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors">
+                <span className="sr-only">LinkedIn</span>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
-              <a href="https://www.instagram.com/hamarkatedralskole1153/" target="_blank" className="text-slate-400 hover:text-pink-600 transition-colors">
-                <span className="sr-only">Instagram</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.332 3.608 1.308.975.975 1.245 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.332 2.633-1.308 3.608-.975.975-2.242 1.245-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.332-3.608-1.308-.975-.975-1.245-2.242-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.245 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.334.06-2.244.272-3.04.581-.824.319-1.522.747-2.217 1.442-.695.695-1.123 1.392-1.442 2.217-.309.796-.521 1.706-.581 3.04-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.06 1.334.272 2.244.581 3.04.319.824.747 1.522 1.442 2.217.695.695 1.392 1.123 2.217 1.442.796.309 1.706.521 3.04.581 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.334-.06 2.244-.272 3.04-.581.824-.319 1.522-.747 2.217-1.442.695-.695 1.123-1.392 1.442-2.217.309-.796.521-1.706.581-3.04.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.06-1.334-.272-2.244-.581-3.04-.319-.824-.747-1.522-1.442-2.217-.695-.695-1.392-1.123-2.217-1.442-.796-.309-1.706-.521-3.04-.581-1.28-.058-1.688-.072-4.947-.072z"/><path d="M12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              <a href="#" target="_blank" className="text-slate-400 hover:text-slate-800 transition-colors">
+                <span className="sr-only">GitHub</span>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
               </a>
             </div>
           </div>

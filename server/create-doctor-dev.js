@@ -15,7 +15,7 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env.development') });
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '3307', 10),
-  database: process.env.DB_NAME || 'nettside_mal_dev',
+  database: process.env.DB_NAME || 'nordic_devices_proveeksamen_dev',
   user: process.env.DB_USER || 'not_root',
   password: process.env.DB_ROOT_PASSWORD,
   waitForConnections: true,
@@ -68,7 +68,7 @@ async function prompt(question, hidden = false) {
 }
 
 async function createDoctor() {
-  console.log('Opprett ny lege-konto for DEVELOPMENT');
+  console.log('Opprett ny administrator for DEVELOPMENT');
   console.log('Database: nettside_mal_dev');
   console.log('');
 
@@ -95,17 +95,17 @@ async function createDoctor() {
       process.exit(1);
     }
 
-    // Opprett ny lege
+    // Opprett ny administrator
     await query(
       'INSERT INTO doctors (username, password_hash) VALUES (?, ?)',
       [username, passwordHash]
     );
     
-    console.log(`Lege "${username}" ble opprettet i development database!`);
+    console.log(`Admin "${username}" ble opprettet i development database!`);
     process.exit(0);
     
   } catch (error) {
-    console.error('Feil ved opprettelse av lege:', error);
+    console.error('Feil ved opprettelse av administrator:', error);
     process.exit(1);
   }
 }

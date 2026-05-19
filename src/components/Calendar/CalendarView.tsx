@@ -55,9 +55,9 @@ function PublicCalendar() {
   return (
     <div className="max-w-4xl mx-auto px-6 pb-6 pt-0">
       <h2 className="text-3xl font-bold text-primary-500 mb-6 flex items-center gap-2">
-        <Calendar className="h-8 w-8" /> Opptatte tidspunkter
+        <Calendar className="h-8 w-8" /> Planlagte hendelser
       </h2>
-      <p className="text-slate-600 mb-8">Her kan du se når helsesykepleier er opptatt. Du kan ikke se hvem som har avtale.</p>
+      <p className="text-slate-600 mb-8">Her kan du se planlagte hendelser og reserverte tidspunkter.</p>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {appointments.length === 0 ? (
@@ -188,10 +188,10 @@ function DoctorCalendar() {
           </div>
           <h2 className="text-2xl font-bold text-red-700">Systemvarsel</h2>
           <p className="text-slate-600 mt-4 leading-relaxed">
-            Det er ingen leger registrert i systemet ennå. 
+            Det er ingen administratorer registrert i systemet ennå. 
           </p>
           <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 text-left text-sm text-slate-500 font-mono">
-            Vennligst opprett en lege manuelt i databasens "doctors"-tabell før du kan logge inn.
+            Vennligst opprett en administrator manuelt i databasens "admins"-tabell før du kan logge inn.
           </div>
         </div>
       </div>
@@ -206,7 +206,7 @@ function DoctorCalendar() {
             <ShieldCheck className="h-10 w-10" />
           </div>
           <h2 className="text-2xl font-bold">Kun for ansatte</h2>
-          <p className="text-slate-500 mt-2">Vennligst logg inn for å se pasientoversikt.</p>
+          <p className="text-slate-500 mt-2">Vennligst logg inn for å se systemoversikt.</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -240,13 +240,13 @@ function DoctorCalendar() {
     );
   }
 
-  if (loading) return <div className="p-8 text-center">Laster pasientdata...</div>;
+  if (loading) return <div className="p-8 text-center">Laster data...</div>;
 
   return (
     <div className="max-w-6xl mx-auto px-6 pb-6 pt-0">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-primary-500 flex items-center gap-2">
-          <User className="h-8 w-8" /> Pasientoversikt
+          <User className="h-8 w-8" /> Systemoversikt
         </h2>
         <button 
           onClick={() => {
@@ -265,7 +265,7 @@ function DoctorCalendar() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="p-4 font-bold text-slate-700">Pasient</th>
+                <th className="p-4 font-bold text-slate-700">Kunde</th>
                 <th className="p-4 font-bold text-slate-700">Tidspunkt</th>
                 <th className="p-4 font-bold text-slate-700">Kontakt</th>
                 <th className="p-4 font-bold text-slate-700">Beskrivelse</th>
@@ -353,7 +353,7 @@ export function CalendarView() {
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Eye className="h-5 w-5" /> Offentlig Kalender
+            <Eye className="h-5 w-5" /> Offentlig status
           </button>
           <button 
             onClick={() => handleSubViewChange('doctor')}
@@ -363,7 +363,7 @@ export function CalendarView() {
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <ShieldCheck className="h-5 w-5" /> Lege-oversikt
+            <ShieldCheck className="h-5 w-5" /> Administrasjon
           </button>
         </div>
       </div>
