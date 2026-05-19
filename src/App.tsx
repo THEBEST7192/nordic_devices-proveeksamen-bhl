@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarView } from './components/Calendar/CalendarView';
 import { ProductSection } from './components/Products/ProductSection';
 import { EmployeeSection } from './components/Employees/EmployeeSection';
+import { PrivacyPolicy } from './components/Legal/PrivacyPolicy';
+import { GDPRConsent } from './components/Legal/GDPRConsent';
 
 const navLinks = [
   { name: 'Hjem', id: 'home', view: 'landing' as const },
@@ -16,7 +18,7 @@ const navLinks = [
 ];
 
 function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'calendar'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'calendar' | 'privacy'>('landing');
   const [activeNavId, setActiveNavId] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [reservation, setReservation] = useState({
@@ -65,7 +67,7 @@ function App() {
     tryScroll();
   }, [scrollToSection]);
 
-  const handleNavClick = (view: 'landing' | 'calendar', id: string) => {
+  const handleNavClick = (view: 'landing' | 'calendar' | 'privacy', id: string) => {
     setCurrentView(view);
     setIsMenuOpen(false);
     setSelectedNav(id);
@@ -81,6 +83,9 @@ function App() {
       } else {
         window.location.hash = id;
       }
+    } else if (view === 'privacy') {
+      window.scrollTo(0, 0);
+      window.history.pushState(null, '', '#privacy');
     } else {
       window.location.hash = id;
     }
@@ -99,6 +104,11 @@ function App() {
 
       // Håndter nøstede hashes som calendar#public ved å splitte
       const [mainHash] = fullHash.split('#');
+      if (mainHash === 'privacy') {
+        setCurrentView('privacy');
+        setSelectedNav('home');
+        return;
+      }
       const link = navLinks.find(l => l.id === mainHash);
       
       if (link) {
@@ -382,7 +392,7 @@ function App() {
                           className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500/20 cursor-pointer"
                         />
                         <span className="text-xs text-slate-600 group-hover:text-slate-900 transition-colors">
-                          Jeg godtar at mine opplysninger behandles i henhold til personvernerklæringen.
+                          Jeg godtar at mine opplysninger behandles i henhold til <button type="button" onClick={() => handleNavClick('privacy', 'privacy')} className="text-primary-600 font-semibold hover:underline">personvernerklæringen</button>.
                         </span>
                       </label>
                     </div>
@@ -390,7 +400,7 @@ function App() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-primary-500 text-white py-4 rounded-xl font-bold hover:bg-primary-600 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-primary-500 text-white py-4 rounded-3xl font-bold hover:bg-primary-600 active:scale-95 active:bg-primary-700 transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                     >
                       {isSubmitting ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -568,8 +578,10 @@ function App() {
               </div>
             </section>
           </>
-        ) : (
+        ) : currentView === 'calendar' ? (
           <CalendarView />
+        ) : (
+          <PrivacyPolicy onBack={() => handleNavClick('landing', 'home')} />
         )}
       </main>
 
@@ -595,7 +607,14 @@ function App() {
             <div>
               <h4 className="font-bold mb-3">Ressurser</h4>
               <ul className="space-y-2 text-slate-600">
-                <li><a href="#" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Personvern <ExternalLink className="h-3 w-3" /></a></li>
+                <li>
+                  <button 
+                    onClick={() => handleNavClick('privacy', 'privacy')}
+                    className="flex items-center gap-1 hover:text-primary-500 transition-colors"
+                  >
+                    Personvern <ExternalLink className="h-3 w-3" />
+                  </button>
+                </li>
                 <li><a href="#" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Informasjonskapsler <ExternalLink className="h-3 w-3" /></a></li>
                 <li><a href="#" target="_blank" className="flex items-center gap-1 hover:text-primary-500">Tilgjengelighetserklæring <ExternalLink className="h-3 w-3" /></a></li>
               </ul>
@@ -618,6 +637,12 @@ function App() {
           </div>
         </div>
       </footer>
+
+      <GDPRConsent 
+        onAccept={() => console.log('GDPR Accepted')} 
+        onDecline={() => console.log('GDPR Declined')}
+        onReadMore={() => handleNavClick('privacy', 'privacy')}
+      />
     </div>
   );
 }
