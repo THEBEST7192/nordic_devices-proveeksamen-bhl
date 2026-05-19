@@ -1,13 +1,23 @@
-import { Laptop, Monitor, Network, Server, HardDrive, Cpu, Heart, ArrowRight } from 'lucide-react';
+import { Laptop, Monitor, Network, Server, HardDrive, Cpu, Heart, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
+import React from 'react';
+
+export interface Product {
+  id: number;
+  icon: React.ReactNode;
+  name: string;
+  price: number;
+  category: string;
+}
 
 interface ProductSectionProps {
   wishlist: number[];
   toggleWishlist: (productId: number) => void;
+  addToCart: (product: Product) => void;
 }
 
-export const ProductSection = ({ wishlist, toggleWishlist }: ProductSectionProps) => {
-  const products = [
+export const ProductSection = ({ wishlist, toggleWishlist, addToCart }: ProductSectionProps) => {
+  const products: Product[] = [
     { id: 1, icon: <Laptop className="h-10 w-10 text-primary-500" />, name: 'Dell Latitude 5440', price: 14500, category: 'PC' },
     { id: 6, icon: <Monitor className="h-10 w-10 text-primary-500" />, name: 'Samsung 27" Skjerm', price: 3200, category: 'Tilbehør' },
     { id: 3, icon: <Network className="h-10 w-10 text-primary-500" />, name: 'UniFi 24-port Switch', price: 5200, category: 'Nettverk' },
@@ -55,15 +65,21 @@ export const ProductSection = ({ wishlist, toggleWishlist }: ProductSectionProps
               </span>
               <h3 className="text-xl font-bold mb-2 text-slate-900">{product.name}</h3>
               <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-100">
-                <span className="text-2xl font-black text-slate-900">
-                  {product.price.toLocaleString('no-NO')} <span className="text-sm font-normal text-slate-600">NOK</span>
-                </span>
-                <button 
-                  className="p-2 rounded-full bg-slate-100 text-slate-700 hover:bg-primary-500 hover:text-white active:scale-90 active:bg-primary-600 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-                  aria-label={`Se mer informasjon om ${product.name}`}
-                >
-                  <ArrowRight className="h-5 w-5" />
-                </button>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black text-slate-900">
+                    {product.price.toLocaleString('no-NO')} <span className="text-sm font-normal text-slate-600">NOK</span>
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => addToCart(product)}
+                    className="p-3 rounded-2xl bg-primary-500 text-white hover:bg-primary-600 active:scale-90 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 flex items-center gap-2"
+                    aria-label={`Legg ${product.name} i handlekurv`}
+                  >
+                    <ShoppingBag className="h-5 w-5" />
+                    <span className="text-sm font-bold">Kjøp produkt</span>
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -72,3 +88,4 @@ export const ProductSection = ({ wishlist, toggleWishlist }: ProductSectionProps
     </section>
   );
 };
+

@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Phone, MapPin, Info, ArrowRight, ExternalLink, Menu, X, User, Mail, ChevronDown, ShieldCheck } from 'lucide-react';
+import { Phone, MapPin, Info, ArrowRight, ExternalLink, Menu, X, User, Mail, ChevronDown, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarView } from './components/Calendar/CalendarView';
 import { ProductSection } from './components/Products/ProductSection';
+import type { Product } from './components/Products/ProductSection';
 import { EmployeeSection } from './components/Employees/EmployeeSection';
 import { PrivacyPolicy } from './components/Legal/PrivacyPolicy';
 import { GDPRConsent } from './components/Legal/GDPRConsent';
+import { CartDrawer } from './components/Cart/CartDrawer';
+
+interface CartItem extends Product {
+  quantity: number;
+}
 
 const navLinks = [
   { name: 'Hjem', id: 'home', view: 'landing' as const },
@@ -30,6 +36,8 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [wishlist, setWishlist] = useState<number[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const toggleWishlist = (productId: number) => {
     setWishlist(prev => 
@@ -37,6 +45,33 @@ function App() {
         ? prev.filter(id => id !== productId) 
         : [...prev, productId]
     );
+  };
+
+  const addToCart = (product: Product) => {
+    setCartItems(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item => 
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    setIsCartOpen(true);
+  };
+
+  const removeFromCart = (productId: number) => {
+    setCartItems(prev => prev.filter(item => item.id !== productId));
+  };
+
+  const updateCartQuantity = (productId: number, delta: number) => {
+    setCartItems(prev => prev.map(item => {
+      if (item.id === productId) {
+        const newQuantity = Math.max(1, item.quantity + delta);
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }));
   };
 
   const setSelectedNav = (id: string) => {
@@ -205,23 +240,50 @@ function App() {
                   </button>
                 );
               })}
-              <button 
-                onClick={() => handleNavClick('landing', 'contact')}
-                className="bg-primary-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-600 transition-all shadow-sm active:scale-95"
-              >
-                Kontakt oss
-              </button>
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2 text-slate-600 hover:text-primary-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-xl group"
+                  aria-label="Åpne handlekurv"
+                >
+                  <ShoppingBag className="h-6 w-6 group-hover:scale-110 transition-transform" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-[10px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
+                      {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                    </span>
+                  )}
+                </button>
+                <button 
+                  onClick={() => handleNavClick('landing', 'contact')}
+                  className="bg-primary-500 text-white px-6 py-2.5 rounded-3xl font-bold hover:bg-primary-600 active:scale-95 transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                >
+                  Kontakt oss
+                </button>
+              </div>
             </div>
 
-            {/* Knapp for mobilmeny */}
-            <button 
-              className="md:hidden p-2 text-slate-600 hover:text-primary-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
-              aria-expanded={isMenuOpen}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            <div className="flex md:hidden items-center gap-2">
+              <button 
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 text-slate-600 hover:text-primary-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-xl"
+                aria-label="Åpne handlekurv"
+              >
+                <ShoppingBag className="h-6 w-6" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-[10px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
+                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
+                )}
+              </button>
+              <button 
+                className="p-2 text-slate-600 hover:text-primary-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
+                aria-expanded={isMenuOpen}
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -298,7 +360,11 @@ function App() {
             </section>
 
             {/* Produkter */}
-            <ProductSection wishlist={wishlist} toggleWishlist={toggleWishlist} />
+            <ProductSection 
+              wishlist={wishlist} 
+              toggleWishlist={toggleWishlist} 
+              addToCart={addToCart}
+            />
 
             {/* Kontaktseksjon */}
             <section id="contact" className="py-24 bg-primary-50">
@@ -637,6 +703,14 @@ function App() {
           </div>
         </div>
       </footer>
+
+      <CartDrawer 
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        onRemove={removeFromCart}
+        onUpdateQuantity={updateCartQuantity}
+      />
 
       <GDPRConsent 
         onAccept={() => console.log('GDPR Accepted')} 
