@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Phone, MapPin, Info, ArrowRight, ExternalLink, Menu, X, User, Mail, ChevronDown, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarView } from './components/Calendar/CalendarView';
-import personImg from './assets/person.jpg';
+import { ProductSection } from './components/Products/ProductSection';
+import { EmployeeSection } from './components/Employees/EmployeeSection';
 
 const navLinks = [
   { name: 'Hjem', id: 'home', view: 'landing' as const },
-  { name: 'Tjenester', id: 'services', view: 'landing' as const },
+  { name: 'Produkter', id: 'products', view: 'landing' as const },
   { name: 'Kontakt', id: 'contact', view: 'landing' as const },
   { name: 'Om oss', id: 'about', view: 'landing' as const },
   { name: 'Ansatte', id: 'employees', view: 'landing' as const },
@@ -26,6 +27,15 @@ function App() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [wishlist, setWishlist] = useState<number[]>([]);
+
+  const toggleWishlist = (productId: number) => {
+    setWishlist(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId) 
+        : [...prev, productId]
+    );
+  };
 
   const setSelectedNav = (id: string) => {
     setActiveNavId(id);
@@ -195,8 +205,10 @@ function App() {
 
             {/* Knapp for mobilmeny */}
             <button 
-              className="md:hidden p-2 text-slate-600 hover:text-primary-500 transition-colors"
+              className="md:hidden p-2 text-slate-600 hover:text-primary-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -258,54 +270,25 @@ function App() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
                       onClick={() => handleNavClick('landing', 'contact')}
-                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-primary-500 text-white font-semibold text-lg hover:bg-primary-600 transition-all shadow-sm group"
+                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-primary-500 text-white font-semibold text-lg hover:bg-primary-600 active:scale-95 active:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-all shadow-sm group"
                     >
                       <Phone className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                       Kontakt oss
                     </button>
                     <button 
                       type="button"
-                      onClick={() => handleNavClick('landing', 'services')}
-                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-white text-slate-900 border-2 border-slate-200 font-semibold text-lg hover:border-primary-300 transition-all group"
+                      onClick={() => handleNavClick('landing', 'products')}
+                      className="inline-flex items-center justify-center px-8 py-4 rounded-3xl bg-white text-slate-900 border-2 border-slate-200 font-semibold text-lg hover:border-primary-300 active:scale-95 active:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-all group"
                     >
-                      Våre tjenester
+                      Våre produkter
                     </button>
                   </div>
                 </motion.div>
               </div>
             </section>
 
-            {/* Funksjoner / Ikoner */}
-            <section id="services" className="pt-24 pb-12 bg-white">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                  <h2 className="text-3xl font-bold mb-4">Våre tjenester</h2>
-                  <p className="text-slate-600 max-w-xl mx-auto">
-                    Moderne IT-løsninger for fremtidens bedrifter
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {[
-                    { icon: <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>, title: "IT-drift og support", desc: "Levering og administrasjon av IT-utstyr og digitale tjenester for din bedrift." },
-                    { icon: <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>, title: "Sikre nettverksløsninger", desc: "Brannmurer, VPN, nettverkssegmentering og overvåkning for å beskytte din bedriftsdata." },
-                    { icon: <svg className="h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>, title: "Brukeradministrasjon", desc: "Active Directory, Microsoft 365 og SSO-løsninger for effektiv og sikker brukerstyring." }
-                  ].map((item, i) => (
-                    <motion.div 
-                      key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
-                      className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
-                    >
-                      <div className="mb-4">{item.icon}</div>
-                      <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                      <p className="text-slate-600">{item.desc}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </section>
+            {/* Produkter */}
+            <ProductSection wishlist={wishlist} toggleWishlist={toggleWishlist} />
 
             {/* Kontaktseksjon */}
             <section id="contact" className="py-24 bg-primary-50">
@@ -319,7 +302,7 @@ function App() {
                   <div className="text-center mb-10">
                     <h2 className="text-3xl font-bold mb-4">Ta kontakt med oss</h2>
                     <p className="text-slate-600">
-                      Fyll ut skjemaet under, så tar vi kontakt med deg innen 24 timer på hverdager.
+                      Fyll ut skjemaet under, så tar vi kontakt med deg.
                     </p>
                   </div>
 
@@ -387,8 +370,7 @@ function App() {
                         <div className="text-xs text-slate-600 leading-relaxed">
                           <p className="font-semibold text-slate-700 mb-1">Personvern og sikkerhet</p>
                           Informasjonen du sender her behandles konfidensielt. 
-                          Vi lagrer kun nødvendige opplysninger for å kunne følge opp din henvendelse, 
-                          og dataene slettes automatisk {import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1'} {(import.meta.env.VITE_RESERVATION_RETENTION_DAYS || '1') === '1' ? 'dag' : 'dager'} etter at saken er avsluttet.
+                          Vi lagrer kun nødvendige opplysninger for å kunne følge opp din henvendelse.
                         </div>
                       </div>
                       <label className="flex items-center gap-3 cursor-pointer group">
@@ -422,7 +404,7 @@ function App() {
             </section>
 
             {/* Om oss */}
-            <section id="about" className="pt-12 pb-0 bg-white">
+            <section id="about" className="py-24 bg-white">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-3xl font-bold mb-8 text-center">Om Nordic Devices</h2>
                 <div className="max-w-3xl mx-auto">
@@ -451,13 +433,9 @@ function App() {
                             <span className="text-slate-600">E-post</span>
                             <span className="font-bold text-primary-700">post@nordicdevices.no</span>
                           </div>
-                          <div className="flex justify-between items-center text-sm border-b border-slate-200 pb-2">
+                          <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-600">Telefon</span>
                             <span className="font-bold text-primary-700">+47 400 00 000</span>
-                          </div>
-                          <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600">Svar innen</span>
-                            <span className="font-bold text-primary-700">24 timer på hverdager</span>
                           </div>
                         </div>
                       </div>
@@ -467,49 +445,7 @@ function App() {
             </section>
 
             {/* Våre ansatte */}
-            <section id="employees" className="py-24 bg-slate-50">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                  <h2 className="text-3xl font-bold mb-4">Møt våre ansatte</h2>
-                  <p className="text-slate-600 max-w-xl mx-auto">
-                    Vårt team av eksperter står klare til å hjelpe din bedrift med alle IT-utfordringer.
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {[
-                     { name: 'Bjørn Johansen', role: 'Daglig Leder', email: 'bjorn@nordicdevices.no' },
-                     { name: 'Bjørnar Nilsen', role: 'Senior IT-Konsulent', email: 'bjornar@nordicdevices.no' },
-                     { name: 'Bjørne Bakke', role: 'Nettverksspesialist', email: 'bjorne@nordicdevices.no' },
-                     { name: 'Bjørn-Erik Larsen', role: 'Supportansvarlig', email: 'bjorn-erik@nordicdevices.no' }
-                   ].map((employee, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
-                      className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-shadow group"
-                    >
-                      <div className="aspect-[4/5] overflow-hidden">
-                        <img
-                          src={personImg}
-                          alt={employee.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="p-6">
-                        <h3 className="text-xl font-bold text-slate-900 mb-1">{employee.name}</h3>
-                        <p className="text-primary-600 font-medium text-sm mb-4">{employee.role}</p>
-                        <div className="flex items-center gap-2 text-slate-500 text-sm">
-                          <Mail className="h-4 w-4" />
-                          <span>{employee.email}</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </section>
+            <EmployeeSection />
 
             {/* FAQ-seksjon */}
             <section id="faq" className="py-24 bg-white">
@@ -553,9 +489,9 @@ function App() {
                       className="border border-slate-200 rounded-2xl overflow-hidden"
                     >
                       <details className="group">
-                        <summary className="flex items-center justify-between p-6 cursor-pointer list-none bg-white hover:bg-slate-50 transition-colors">
+                        <summary className="flex items-center justify-between p-6 cursor-pointer list-none bg-white hover:bg-slate-50 transition-colors focus:outline-none focus:bg-slate-50 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-inset rounded-2xl">
                           <span className="font-bold text-slate-900 pr-4">{faq.q}</span>
-                          <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform" />
+                          <ChevronDown className="h-5 w-5 text-slate-500 group-open:rotate-180 transition-transform" />
                         </summary>
                         <div className="px-6 pb-6 text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
                           {faq.a}
@@ -625,6 +561,7 @@ function App() {
                       loading="lazy" 
                       referrerPolicy="no-referrer-when-downgrade"
                       className="opacity-100"
+                      title="Kart over Nordic Devices plassering i Hell, Trondheim"
                     ></iframe>
                   </div>
                 </div>
@@ -650,7 +587,7 @@ function App() {
               <h4 className="font-bold mb-3">Lenker</h4>
               <ul className="space-y-2 text-slate-600">
                 <li><a href="#" className="hover:text-primary-500 transition-colors">Hjem</a></li>
-                <li><a href="#" className="hover:text-primary-500 transition-colors">Tjenester</a></li>
+                <li><a href="#" className="hover:text-primary-500 transition-colors">Produkter</a></li>
                 <li><a href="#" className="hover:text-primary-500 transition-colors">Om oss</a></li>
                 <li><a href="#" className="hover:text-primary-500 transition-colors">Kontakt oss</a></li>
               </ul>
@@ -666,16 +603,16 @@ function App() {
           </div>
           <div className="pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-400 text-xs italic">
-              Dette er en demoside for eksamen, ikke en offisiell nettside for Nordic Devices AS.
+              Dette er en demoside for eksamen, og er ikke den offisielle nettsiden for Nordic Devices AS.
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors">
+              <a href="#" target="_blank" className="text-slate-500 hover:text-blue-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:scale-90 rounded-md p-1">
                 <span className="sr-only">LinkedIn</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
-              <a href="#" target="_blank" className="text-slate-400 hover:text-slate-800 transition-colors">
+              <a href="#" target="_blank" className="text-slate-500 hover:text-slate-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:scale-90 rounded-md p-1">
                 <span className="sr-only">GitHub</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
               </a>
             </div>
           </div>

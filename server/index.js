@@ -222,60 +222,10 @@ const initDb = async () => {
     }
     
     console.log('Database initialisert med normalisert skjema');
-    
-    // Kjør initiell opprydding etter at tabeller er opprettet
-    setTimeout(() => {
-      cleanupOldReservations().catch(err => {
-        console.error('Feil ved kjøring av første opprydding av reservasjoner:', err);
-      });
-    }, 3000); // Vent 3 sekunder for å sikre at tabeller er klare
   } catch (err) {
     console.error('Feil ved initialisering av database:', err);
   }
 };
-
-const reservationRetentionDaysEnv = parseInt(process.env.RESERVATION_RETENTION_DAYS || '1', 10); // 1 day, base 10
-const reservationRetentionDays = Number.isNaN(reservationRetentionDaysEnv) ? 1 : reservationRetentionDaysEnv;
-const cleanupIntervalMs = 24 * 60 * 60 * 1000;
-
-const cleanupOldReservations = async () => {
-  try {
-    await transaction(async (conn) => {
-      // 1. Slett gamle reservasjoner
-      await conn.execute(
-        'DELETE FROM reservations WHERE DATEDIFF(CURRENT_DATE, date) > ?',
-        [reservationRetentionDays]
-      );
-      
-      // 2. Slett brukere som ikke lenger har noen reservasjoner
-      await conn.execute(`
-        DELETE FROM users
-        WHERE id NOT IN (SELECT user_id FROM reservations)
-      `);
-      
-      // 3. Slett e-poster som ikke lenger er knyttet til noen bruker
-      await conn.execute(`
-        DELETE FROM emails
-        WHERE id NOT IN (SELECT email_id FROM users WHERE email_id IS NOT NULL)
-      `);
-      
-      // 4. Slett telefonnumre som ikke lenger er knyttet til noen bruker
-      await conn.execute(`
-        DELETE FROM phones
-        WHERE id NOT IN (SELECT phone_id FROM users WHERE phone_id IS NOT NULL)
-      `);
-    });
-    console.log(`Opprydding av gamle reservasjoner og tilhørende data fullført (oppbevaring ${reservationRetentionDays} dager)`);
-  } catch (err) {
-    console.error('Feil ved opprydding av gamle reservasjoner:', err);
-  }
-};
-
-setInterval(() => {
-  cleanupOldReservations().catch(err => {
-    console.error('Feil i planlagt opprydding av reservasjoner:', err);
-  });
-}, cleanupIntervalMs);
 
 app.get('/api/doctors/check', async (req, res) => {
   try {
